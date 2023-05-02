@@ -2,23 +2,18 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs;
 
-use ManualLogEntry;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
+use MediaWiki\Page\Hook\ArticleDeleteCompleteHook;
 use MediaWiki\Page\Hook\ArticleUndeleteHook;
-use MediaWiki\Page\Hook\PageDeleteCompleteHook;
-use MediaWiki\Page\Hook\PageUndeleteHook;
 use MediaWiki\Page\PageIdentity;
-use MediaWiki\Page\ProperPageIdentity;
-use MediaWiki\Permissions\Authority;
-use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
-use StatusValue;
 use Wikimedia\Rdbms\ILoadBalancer;
 
-class TitleIndexUpdater implements PageSaveCompleteHook,
+class TitleIndexUpdater implements
+	PageSaveCompleteHook,
 	PageMoveCompleteHook,
-	PageDeleteCompleteHook,
+	ArticleDeleteCompleteHook,
 	ArticleUndeleteHook,
 	AfterImportPageHook
 {
@@ -58,11 +53,10 @@ class TitleIndexUpdater implements PageSaveCompleteHook,
 	/**
 	 * @inheritDoc
 	 */
-	public function onPageDeleteComplete(
-		ProperPageIdentity $page, Authority $deleter, string $reason, int $pageID,
-		RevisionRecord $deletedRev, ManualLogEntry $logEntry, int $archivedRevisionCount
+	public function onArticleDeleteComplete(
+		$wikiPage, $user, $reason, $id, $content, $logEntry, $archivedRevisionCount
 	) {
-		$this->delete( $page->getNamespace(), $page->getDBkey() );
+		$this->delete( $wikiPage->getTitle()->getNamespace(), $wikiPage->getTitle()->getDBkey() );
 	}
 
 	/**
