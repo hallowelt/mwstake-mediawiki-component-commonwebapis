@@ -6,8 +6,8 @@ use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
 use MediaWiki\Page\Hook\ArticleDeleteCompleteHook;
 use MediaWiki\Page\Hook\ArticleUndeleteHook;
-use MediaWiki\Page\PageIdentity;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
+use Title;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleIndexUpdater implements
@@ -74,11 +74,11 @@ class TitleIndexUpdater implements
 	}
 
 	/**
-	 * @param PageIdentity $page
+	 * @param Title $page
 	 *
 	 * @return bool|void
 	 */
-	private function insert( PageIdentity $page, $forceId = null ) {
+	private function insert( Title $page, $forceId = null ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$page->exists() ) {
 			return;
