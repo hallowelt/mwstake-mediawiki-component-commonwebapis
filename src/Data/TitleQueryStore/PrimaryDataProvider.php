@@ -41,7 +41,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$query = $params->getQuery();
 		foreach ( $filters as $filter ) {
 			if ( in_array( $filter->getField(), [ TitleRecord::PAGE_DBKEY, TitleRecord::PAGE_TITLE ] ) ) {
-				$query = $filter->getValue();
 				$filter->setApplied( true );
 			}
 			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE_TEXT ) {
@@ -79,10 +78,29 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	}
 
 	/**
+	 * Replace filters for page title with normalized field
+	 *
+	 * @param array &$conds
+	 * @param Filter $filter
+	 *
+	 * @return void
+	 */
+	protected function appendPreFilterCond( &$conds, Filter $filter ) {
+		if ( in_array( $filter->getField(), [ TitleRecord::PAGE_DBKEY, TitleRecord::PAGE_TITLE ] ) ) {
+			$filter = new Filter\StringValue( [
+				Filter::KEY_FIELD => 'mti_title',
+				Filter::KEY_VALUE => mb_strtolower( str_replace( '_', ' ', $filter->getValue() ) ),
+				Filter::KEY_COMPARISON => $filter->getComparison()
+			] );
+		}
+		parent::appendPreFilterCond( $conds, $filter );
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected function getFields() {
-		return [ 'mti_page_id', 'page_namespace', 'page_title', 'page_content_model', 'page_lang' ];
+		return [ 'mti_page_id', 'mti_title', 'page_namespace', 'page_title', 'page_content_model', 'page_lang' ];
 	}
 
 	/**
@@ -90,7 +108,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 */
 	protected function skipPreFilter( Filter $filter ) {
 		return in_array( $filter->getField(), [
-			TitleRecord::PAGE_DBKEY, TitleRecord::PAGE_TITLE,
 			TitleRecord::PAGE_NAMESPACE, TitleRecord::PAGE_NAMESPACE_TEXT,
 			TitleRecord::IS_CONTENT_PAGE
 		] );
