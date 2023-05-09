@@ -7,7 +7,7 @@ class PopulateTitleIndex extends \LoggedUpdateMaintenance {
 	 * @return bool
 	 */
 	protected function doDBUpdates() {
-		$db = $this->getDB( DB_PRIMARY );
+		$db = $this->getDB( DB_REPLICA );
 
 		$titles = $db->select(
 			'page',
@@ -18,7 +18,7 @@ class PopulateTitleIndex extends \LoggedUpdateMaintenance {
 
 		$toInsert = [];
 		$cnt = 0;
-$batch = 250;
+		$batch = 250;
 		foreach ( $titles as $title ) {
 			$toInsert[] = [
 				'mti_page_id' => $title->page_id,
@@ -26,19 +26,28 @@ $batch = 250;
 				'mti_title' => mb_strtolower( str_replace( '_', ' ', $title->page_title ) )
 			];
 			if ( $cnt % $batch === 0 ) {
-				$db->insert(
-					'mws_title_index',
-					$toInsert,
-					__METHOD__,
-					[ 'IGNORE' ]
-				);
+				$this->insertBatch( $toInsert );
 				$toInsert = [];
 			}
+			$cnt++;
+		}
+		if ( !empty( $toInsert ) ) {
+			$this->insertBatch( $toInsert );
 		}
 
 		$this->output( "Indexed $cnt pages\n" );
 
 		return true;
+	}
+
+	private function insertBatch( array $batch ) {
+		$db = $this->getDB( DB_PRIMARY );
+		$db->insert(
+			'mws_title_index',
+			$batch,
+			__METHOD__,
+			[ 'IGNORE' ]
+		);
 	}
 
 	/**

@@ -7,7 +7,7 @@ class PopulateUserIndex extends \LoggedUpdateMaintenance {
 	 * @return bool
 	 */
 	protected function doDBUpdates() {
-		$db = $this->getDB( DB_PRIMARY );
+		$db = $this->getDB( DB_REPLICA );
 
 		$users = $db->select(
 			'user',
@@ -18,7 +18,7 @@ class PopulateUserIndex extends \LoggedUpdateMaintenance {
 
 		$toInsert = [];
 		$cnt = 0;
-$batch = 250;
+		$batch = 250;
 		foreach ( $users as $user ) {
 			$toInsert[] = [
 				'mui_user_id' => $user->user_id,
@@ -26,19 +26,33 @@ $batch = 250;
 				'mui_user_real_name' => mb_strtolower( $user->user_real_name )
 			];
 			if ( $cnt % $batch === 0 ) {
-				$db->insert(
-					'mws_user_index',
-					$toInsert,
-					__METHOD__,
-					[ 'IGNORE' ]
-				);
+				$this->insertBatch( $toInsert );
 				$toInsert = [];
 			}
+			$cnt++;
+		}
+		if ( !empty( $toInsert ) ) {
+			$this->insertBatch( $toInsert );
 		}
 
 		$this->output( "Indexed $cnt users\n" );
 
 		return true;
+	}
+
+	/**
+	 * @param array $batch
+	 *
+	 * @return void
+	 */
+	private function insertBatch( array $batch ) {
+		$db = $this->getDB( DB_PRIMARY );
+		$db->insert(
+			'mws_user_index',
+			$batch,
+			__METHOD__,
+			[ 'IGNORE' ]
+		);
 	}
 
 	/**
