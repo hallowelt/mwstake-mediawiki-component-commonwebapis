@@ -125,6 +125,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			TitleRecord::PAGE_DBKEY => $row->page_title,
 			TitleRecord::PAGE_CONTENT_MODEL => $row->page_content_model,
 			TitleRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
+			TitleRecord::PAGE_EXISTS => true,
 		] );
 	}
 

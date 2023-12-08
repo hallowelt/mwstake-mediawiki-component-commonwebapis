@@ -8,8 +8,12 @@ use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleQueryStore extends QueryStore {
-	/** @var Store */
-	private $store;
+	/** @var ILoadBalancer */
+	protected $lb;
+	/** @var \TitleFactory */
+	protected $titleFactory;
+	/** @var \Language */
+	protected $language;
 
 	/**
 	 * @param HookContainer $hookContainer
@@ -23,13 +27,16 @@ class TitleQueryStore extends QueryStore {
 		\Language $language, \NamespaceInfo $nsInfo
 	) {
 		parent::__construct( $hookContainer );
-		$this->store = new Store( $lb, $titleFactory, $language, $nsInfo );
+		$this->lb = $lb;
+		$this->titleFactory = $titleFactory;
+		$this->language = $language;
+		$this->nsInfo = $nsInfo;
 	}
 
 	/**
 	 * @return IStore
 	 */
 	protected function getStore(): IStore {
-		return $this->store;
+		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo );
 	}
 }

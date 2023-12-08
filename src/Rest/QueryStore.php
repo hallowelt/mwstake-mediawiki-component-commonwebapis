@@ -149,21 +149,21 @@ abstract class QueryStore extends Handler {
 	/**
 	 * @return int
 	 */
-	private function getOffset(): int {
+	protected function getOffset(): int {
 		return (int)$this->getValidatedParams()['start'];
 	}
 
 	/**
 	 * @return int
 	 */
-	private function getLimit(): int {
+	protected function getLimit(): int {
 		return (int)$this->getValidatedParams()['limit'];
 	}
 
 	/**
 	 * @return array
 	 */
-	private function getFilter(): array {
+	protected function getFilter(): array {
 		$validated = $this->getValidatedParams();
 		if ( is_array( $validated ) && isset( $validated['filter'] ) ) {
 			return json_decode( $validated['filter'], 1 );
@@ -174,7 +174,7 @@ abstract class QueryStore extends Handler {
 	/**
 	 * @return array
 	 */
-	private function getSort(): array {
+	protected function getSort(): array {
 		$validated = $this->getValidatedParams();
 		if ( is_array( $validated ) && isset( $validated['sort'] ) ) {
 			return json_decode( $validated['sort'], 1 );
@@ -185,14 +185,14 @@ abstract class QueryStore extends Handler {
 	/**
 	 * @return string
 	 */
-	private function getFormat(): string {
+	protected function getFormat(): string {
 		return $this->getValidatedParams()['format'];
 	}
 
 	/**
 	 * @return string
 	 */
-	private function getQuery(): string {
+	protected function getQuery(): string {
 		return $this->getValidatedParams()['query'];
 	}
 }
