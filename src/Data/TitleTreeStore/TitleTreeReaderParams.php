@@ -29,6 +29,9 @@ class TitleTreeReaderParams extends \MWStake\MediaWiki\Component\DataStore\Reade
 	 * @return string[]
 	 */
 	public function getExpandPaths(): array {
-		return $this->expandPaths;
+		if ( $this->expandPaths ) {
+			return json_decode( $this->expandPaths, 1 );
+		}
+		return [];
 	}
 }

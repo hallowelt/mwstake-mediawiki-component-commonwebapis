@@ -2,8 +2,6 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
-use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
-use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\DataStore\Schema;
 use Wikimedia\Rdbms\IDatabase;
@@ -11,6 +9,8 @@ use Wikimedia\Rdbms\IDatabase;
 class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider {
 	/** @var string|null */
 	private $query = null;
+	/** @var array|null */
+	private $expandPaths = null;
 
 	/** @var \NamespaceInfo */
 	private $nsInfo;
@@ -24,18 +24,22 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	}
 
 	/**
-	 * @param ReaderParams $params
+	 * @param TitleTreeReaderParams $params
 	 *
 	 * @return \MWStake\MediaWiki\Component\DataStore\Record[]
 	 */
 	public function makeData( $params ) {
+		if ( $params->getExpandPaths() ) {
+			$this->expandPaths = $params->getExpandPaths();
+		}
 		if ( $params->getNode() !== '' ) {
 			$node = $params->getNode();
-			$node = $this->nodeToUniqueId( $node );
+			$node = $this->splitNode( $node );
 			if ( $node ) {
 				return $this->dataFromNode( $node );
 			}
 		}
+
 		return array_values( parent::makeData( $params ) );
 	}
 
@@ -60,10 +64,15 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		$indexTitle = $row->mti_title;
 		$uniqueId = $this->getUniqueId( $row );
 		if ( $this->isSubpage( $indexTitle ) ) {
-			if ( $this->queryMatchesSubpage( $indexTitle ) ) {
+			if (
+				$this->queryMatchesSubpage( $indexTitle )
+			) {
 				$this->insertParents( $row, $uniqueId, true );
 			}
 			return;
+		}
+		if ( $this->isExpandRequested( $row->page_title, (int)$row->page_namespace ) ) {
+			$this->expand( $row, $uniqueId, false );
 		}
 
 		// Adding root pages
@@ -93,7 +102,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	}
 
 	/**
-	 * @param $row
+	 * @param \stdClass $row
 	 *
 	 * @return string
 	 */
@@ -110,7 +119,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		return strpos( $indexTitle, '/' ) !== false;
 	}
 
-
 	/**
 	 * @param string $indexTitle
 	 *
@@ -118,12 +126,23 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	 */
 	private function queryMatchesSubpage( string $indexTitle ): bool {
 		if ( !$this->query ) {
-			return true;
+			return false;
 		}
 		$exploded = explode( '/', $indexTitle );
 		// Get rid of the first element, which is the root page name
 		array_shift( $exploded );
 		return strpos( $indexTitle, $this->query ) !== false;
+	}
+
+	/**
+	 * @param \stdClass $row
+	 * @param string $uniqueId
+	 *
+	 * @return void
+	 */
+	private function expand( \stdClass $row, string $uniqueId ) {
+		$row->children = $this->getChildren( $row, null );
+		$this->insertParents( $row, $this->getUniqueId( $row ) );
 	}
 
 	/**
@@ -189,17 +208,18 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				'page_namespace' => $row->page_namespace,
 				'page_title LIKE ' . $this->db->addQuotes( $row->page_title . '/%' )
 			],
-			__METHOD__
+			__METHOD__,
+			[ 'ORDER BY' => 'page_title' ]
 		);
 	}
 
 	/**
-	 * @param $parent
-	 * @param $child
+	 * @param string $parent
+	 * @param string $child
 	 *
 	 * @return bool
 	 */
-	private function isDirectChildOf( $parent, $child ) {
+	private function isDirectChildOf( string $parent, string $child ): bool {
 		$parentBits = explode( '/', $parent );
 		$childBits = explode( '/', $child );
 		if ( count( $childBits ) !== count( $parentBits ) + 1 ) {
@@ -218,7 +238,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	 *
 	 * @return array|null
 	 */
-	private function nodeToUniqueId( string $node ): ?array {
+	private function splitNode( string $node ): ?array {
 		$bits = explode( ':', $node );
 		if ( count( $bits ) === 1 ) {
 			return '0:' . $bits[0];
@@ -244,7 +264,8 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			[ 'page' ],
 			[ 'page_title', 'page_namespace' ],
 			$node,
-			__METHOD__
+			__METHOD__,
+			[ 'ORDER BY' => 'page_title' ]
 		);
 
 		if ( !$row ) {
@@ -252,5 +273,24 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		}
 
 		return $this->getChildren( $row, null );
+	}
+
+	/**
+	 * @param string $dbkey
+	 * @param int $ns
+	 *
+	 * @return bool
+	 */
+	private function isExpandRequested( string $dbkey, int $ns ): bool {
+		if ( !$this->expandPaths ) {
+			return false;
+		}
+		foreach ( $this->expandPaths as $path ) {
+			$pathParts = $this->splitNode( $path );
+			if ( $dbkey === $pathParts['page_title'] && $ns === $pathParts['page_namespace'] ) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

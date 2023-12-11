@@ -6,6 +6,10 @@ use MWStake\MediaWiki\Component\DataStore\FieldType;
 use MWStake\MediaWiki\Component\DataStore\Schema;
 
 class TitleSchema extends Schema {
+
+	/**
+	 * @param array $fields
+	 */
 	public function __construct( array $fields = [] ) {
 		parent::__construct( array_merge( [
 			TitleRecord::PAGE_ID => [

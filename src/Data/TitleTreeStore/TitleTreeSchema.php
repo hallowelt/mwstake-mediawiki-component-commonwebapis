@@ -4,7 +4,6 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleSchema;
 use MWStake\MediaWiki\Component\DataStore\FieldType;
-use MWStake\MediaWiki\Component\DataStore\Schema;
 
 class TitleTreeSchema extends TitleSchema {
 	public function __construct() {

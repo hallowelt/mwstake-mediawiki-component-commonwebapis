@@ -2,13 +2,11 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
-use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore\Store;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore\TitleTreeReaderParams;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use Wikimedia\ParamValidator\ParamValidator;
-use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleTreeStore extends TitleQueryStore {
 
@@ -34,7 +32,10 @@ class TitleTreeStore extends TitleQueryStore {
 		] );
 	}
 
-	protected function getStoreSpecificParams() : array {
+	/**
+	 * @return array[]
+	 */
+	protected function getStoreSpecificParams(): array {
 		return [
 			'node' => [
 				static::PARAM_SOURCE => 'query',

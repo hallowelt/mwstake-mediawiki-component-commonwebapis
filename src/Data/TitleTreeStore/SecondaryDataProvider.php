@@ -2,12 +2,14 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
-use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
-use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
+use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\SecondaryDataProvider as TitleSecondaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\Record;
 
-class SecondaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\SecondaryDataProvider {
+class SecondaryDataProvider extends TitleSecondaryDataProvider {
 
+	/**
+	 * @inheritDoc
+	 */
 	public function extend( $dataSets ) {
 		$extended = parent::extend( $dataSets );
 		foreach ( $extended as $dataSet ) {

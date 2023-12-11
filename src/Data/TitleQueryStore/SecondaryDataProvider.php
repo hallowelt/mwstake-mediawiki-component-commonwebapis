@@ -56,7 +56,7 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 	 */
 	protected function titleFromRecord( $record ) {
 		return $this->titleFactory->makeTitle(
-			$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_TITLE)
+			$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_TITLE )
 		);
 	}
 }

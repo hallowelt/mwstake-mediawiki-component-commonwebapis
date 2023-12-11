@@ -3,7 +3,6 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
-use MWStake\MediaWiki\Component\DataStore\Record;
 
 class TitleTreeRecord extends TitleRecord {
 	public const ID = 'id';
