@@ -89,7 +89,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$query = $params->getQuery();
 		foreach ( $filters as $filter ) {
 			if ( $filter->getField() === 'user_name' ) {
-				$query = mb_strtolower( $filter->getValue() );
+				// Usernames are stored with spaces in the user table
+				$query = str_replace( '_', ' ', $filter->getValue() );
 				$filter->setApplied( true );
 			}
 		}
