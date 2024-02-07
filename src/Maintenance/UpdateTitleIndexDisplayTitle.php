@@ -18,7 +18,7 @@ class UpdateTitleIndexDisplayTitle extends \LoggedUpdateMaintenance {
 			__METHOD__
 		);
 
-		$toUpdate = [ 'values' => [], 'conds' => [] ];
+		$toUpdate = [];
 		$cnt = 0;
 		$batch = 250;
 		foreach ( $titles as $title ) {
@@ -26,19 +26,17 @@ class UpdateTitleIndexDisplayTitle extends \LoggedUpdateMaintenance {
 			if ( !$display ) {
 				continue;
 			}
-			$toUpdate['values'] = [
-				'mti_displaytitle' => $display,
+			$toUpdate[] = [
+				'values' => [ 'mti_displaytitle' => $display ],
+				'conds' => [ 'mti_page_id' => $title->page_id ],
 			];
-			$toUpdate['conds'] = [
-				'mti_page_id' => $title->page_id,
-			];
+			$cnt++;
 			if ( $cnt % $batch === 0 ) {
 				$this->updateBatch( $toUpdate );
 				$toUpdate = [];
 			}
-			$cnt++;
 		}
-		if ( !empty( $toUpdate['values'] ) ) {
+		if ( !empty( $toUpdate ) ) {
 			$this->updateBatch( $toUpdate );
 		}
 
@@ -52,13 +50,15 @@ class UpdateTitleIndexDisplayTitle extends \LoggedUpdateMaintenance {
 	 */
 	private function updateBatch( array $batch ) {
 		$db = $this->getDB( DB_PRIMARY );
-		$db->update(
-			'mws_title_index',
-			$batch['values'],
-			$batch['conds'],
-			__METHOD__,
-			[ 'IGNORE' ]
-		);
+		foreach ( $batch as $update ) {
+			$db->update(
+				'mws_title_index',
+				$update['values'],
+				$update['conds'],
+				__METHOD__,
+				[ 'IGNORE' ]
+			);
+		}
 	}
 
 	/**
