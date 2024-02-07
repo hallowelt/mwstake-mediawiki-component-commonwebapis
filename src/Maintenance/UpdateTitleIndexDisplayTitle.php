@@ -18,47 +18,39 @@ class UpdateTitleIndexDisplayTitle extends \LoggedUpdateMaintenance {
 			__METHOD__
 		);
 
-		$toUpdate = [];
-		$cnt = 0;
-		$batch = 250;
+		$success = $fail = 0;
 		foreach ( $titles as $title ) {
 			$display = $this->getDisplayTitle( $title );
 			if ( !$display ) {
 				continue;
 			}
-			$toUpdate[] = [
-				'values' => [ 'mti_displaytitle' => $display ],
-				'conds' => [ 'mti_page_id' => $title->page_id ],
-			];
-			$cnt++;
-			if ( $cnt % $batch === 0 ) {
-				$this->updateBatch( $toUpdate );
-				$toUpdate = [];
+			if ( $this->update( $title->page_id, $display ) ) {
+				$success++;
+			} else {
+				$fail++;
 			}
 		}
-		if ( !empty( $toUpdate ) ) {
-			$this->updateBatch( $toUpdate );
-		}
 
-		$this->output( "Updated index for $cnt pages\n" );
+		$this->output( "Added display title in title index for $success page(s), $fail failed\n" );
 
 		return true;
 	}
 
 	/**
-	 * @param array $batch
+	 * @param string $pageId
+	 * @param string $display
+	 *
+	 * @return bool
 	 */
-	private function updateBatch( array $batch ) {
+	private function update( string $pageId, string $display ) {
 		$db = $this->getDB( DB_PRIMARY );
-		foreach ( $batch as $update ) {
-			$db->update(
-				'mws_title_index',
-				$update['values'],
-				$update['conds'],
-				__METHOD__,
-				[ 'IGNORE' ]
-			);
-		}
+		return $db->update(
+			'mws_title_index',
+			[ 'mti_displaytitle' => $display ],
+			[ 'mti_page_id' => $pageId ],
+			__METHOD__,
+			[ 'IGNORE' ]
+		);
 	}
 
 	/**
