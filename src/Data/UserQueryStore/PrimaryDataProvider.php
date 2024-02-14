@@ -89,18 +89,16 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$query = $params->getQuery();
 		foreach ( $filters as $filter ) {
 			if ( $filter->getField() === 'user_name' ) {
+				// Usernames are stored with spaces in the query table
+				$filterValue = str_replace( '_', ' ', $filter->getValue() );
 				if (
 					$filter->getComparison() === Filter::COMPARISON_CONTAINS ||
 					$filter->getComparison() === Filter::COMPARISON_LIKE
 				) {
-					// Usernames are stored with spaces in the query table
-					$filterValue = str_replace( '_', ' ', $filter->getValue() );
 					$query = $filterValue;
 				} elseif ( $filter->getComparison() === Filter::COMPARISON_EQUALS ) {
-					$filterValue = str_replace( ' ', '_', $filter->getValue() );
 					$conds['user_name'] = $filterValue;
 				} elseif ( $filter->getComparison() === Filter::COMPARISON_NOT_EQUALS ) {
-					$filterValue = str_replace( ' ', '_', $filter->getValue() );
 					$conds['user_name NOT'] = $filterValue;
 				}
 				$filter->setApplied( true );
