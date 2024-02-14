@@ -53,6 +53,7 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 			TitleRecord::PAGE_NAMESPACE_TEXT, $this->language->getNsText( $title->getNamespace() )
 		);
 		$dataSet->set( TitleRecord::PAGE_DISPLAY_TITLE, $this->getDisplayTitle( $title ) );
+		$dataSet->set( TitleRecord::PAGE_IS_REDIRECT, $title->isRedirect() );
 	}
 
 	/**

@@ -66,6 +66,11 @@ class TitleSchema extends Schema {
 				self::FILTERABLE => true,
 				self::SORTABLE => true ,
 				self::TYPE => FieldType::BOOLEAN
+			],
+			TitleRecord::PAGE_IS_REDIRECT => [
+				self::FILTERABLE => true,
+				self::SORTABLE => true ,
+				self::TYPE => FieldType::BOOLEAN
 			]
 		], $fields ) );
 	}

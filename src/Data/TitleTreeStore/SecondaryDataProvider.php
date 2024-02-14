@@ -32,7 +32,6 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 			$dataSet->set( TitleTreeRecord::ID, $title->getPrefixedDBkey() );
 		}
 		$dataSet->set( TitleTreeRecord::PAGE_EXISTS, $title->exists() );
-		$dataSet->set( TitleTreeRecord::REDIRECT, $title->isRedirect() );
 		if (
 			(
 				$dataSet->get( TitleTreeRecord::LOADED ) &&

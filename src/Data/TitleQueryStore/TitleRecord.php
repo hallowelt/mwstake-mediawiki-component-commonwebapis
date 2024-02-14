@@ -16,4 +16,5 @@ class TitleRecord extends Record {
 	public const PAGE_CONTENT_MODEL = 'content_model';
 	public const PAGE_URL = 'url';
 	public const IS_CONTENT_PAGE = 'is_content_page';
+	public const PAGE_IS_REDIRECT = 'redirect';
 }
