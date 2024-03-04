@@ -17,6 +17,7 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 			$pageProps = \MediaWiki\MediaWikiServices::getInstance()->getPageProps();
 			$titleIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\TitleIndexUpdater( $lb, $pageProps );
 			$userIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\UserIndexUpdater( $lb );
+			$categoryIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\CategoryIndexUpdater( $lb );
 			$hookContainer = \MediaWiki\MediaWikiServices::getInstance()->getHookContainer();
 
 			$hookContainer->register( 'LoadExtensionSchemaUpdates', static function ( $updater ) {
@@ -33,6 +34,10 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 					'mti_displaytitle',
 					__DIR__ . "/sql/mws_title_index_displaytitle_patch.sql"
 				);
+				$updater->addExtensionTable(
+					'mws_category_index',
+					__DIR__ . "/sql/mws_category_index.sql"
+				);
 
 				$updater->addPostDatabaseUpdateMaintenance(
 					\MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance\PopulateUserIndex::class
@@ -43,6 +48,9 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 				$updater->addPostDatabaseUpdateMaintenance(
 					\MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance\UpdateTitleIndexDisplayTitle::class
 				);
+				$updater->addPostDatabaseUpdateMaintenance(
+					\MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance\PopulateCategoryIndex::class
+				);
 			} );
 
 			$hookContainer->register( 'UserSaveSettings', [ $userIndexUpdater, 'store' ] );
@@ -52,6 +60,10 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 			$hookContainer->register( 'PageDeleteComplete', [ $titleIndexUpdater, 'onPageDeleteComplete' ] );
 			$hookContainer->register( 'ArticleUndelete', [ $titleIndexUpdater, 'onArticleUndelete' ] );
 			$hookContainer->register( 'AfterImportPage', [ $titleIndexUpdater, 'onAfterImportPage' ] );
+			$hookContainer->register( 'CategoryAfterPageAdded', [ $categoryIndexUpdater, 'onCategoryAfterPageAdded' ] );
+			$hookContainer->register(
+				'CategoryAfterPageRemoved', [ $categoryIndexUpdater, 'onCategoryAfterPageRemoved' ]
+			);
 		};
 
 		$GLOBALS['wgResourceModules']['ext.mws.commonwebapis'] = [

@@ -17,6 +17,7 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 	 */
 	protected function extendWithTitle( Record $dataSet, Title $title ) {
 		parent::extendWithTitle( $dataSet, $title );
+		$dataSet->set( TitleRecord::PAGE_ID, $title->getArticleID() );
 		$dataSet->set( TitleRecord::PAGE_EXISTS, $title->exists() );
 	}
 }

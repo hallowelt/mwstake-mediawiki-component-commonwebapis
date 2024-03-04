@@ -3,7 +3,6 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\CategoryQueryStore;
 
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
-use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 
 class CategoryReaderParams extends ReaderParams {
@@ -32,7 +31,6 @@ class CategoryReaderParams extends ReaderParams {
 		$this->setIfAvailable( $this->start, $params, static::PARAM_START );
 		$this->setIfAvailable( $this->limit, $params, static::PARAM_LIMIT );
 		$this->setIfAvailable( $this->sort, $params, static::PARAM_SORT );
-		$this->setIfAvailable( $this->filter, $params, static::PARAM_FILTER );
 	}
 
 	/**
@@ -48,11 +46,6 @@ class CategoryReaderParams extends ReaderParams {
 				$newFilters[] = $filter;
 			}
 		}
-		$newFilters[] = new Filter\ListValue( [
-			Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
-			Filter::KEY_VALUE => [ NS_CATEGORY ],
-			Filter::KEY_COMPARISON => 'in'
-		] );
 		return $newFilters;
 	}
 

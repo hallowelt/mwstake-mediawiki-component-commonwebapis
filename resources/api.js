@@ -144,5 +144,12 @@ mws.commonwebapis = {
 				return queryStore( 'file-query-store', $.extend( { query: query }, params || {} ) );
 			} );
 		}
+	},
+	category: {
+		query: function( query, params ) {
+			return cache.getCachedPromise( 'promise-category-query', function() {
+				return queryStore( 'category-query-store', $.extend( { query: query }, params || {} ) );
+			} );
+		},
 	}
 }
