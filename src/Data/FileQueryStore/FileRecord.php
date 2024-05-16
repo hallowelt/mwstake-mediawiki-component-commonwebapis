@@ -6,7 +6,8 @@ use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
 
 class FileRecord extends TitleRecord {
 	public const FILE_EXTENSION = 'file_extension';
-	public const MIME_MAJOR = 'mime_major';
+	public const MIME_MAJOR = 'img_mime_major';
+	public const MIME_MINOR = 'img_mime_minor';
 	public const FILE_SIZE = 'file_size';
 	public const FILE_AUTHOR_NAME = 'author';
 	public const FILE_TIMESTAMP = 'timestamp';

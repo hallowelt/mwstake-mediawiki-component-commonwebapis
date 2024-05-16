@@ -66,14 +66,6 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 				FileRecord::FILE_THUMBNAIL_URL_PREVIEW,
 				$file->createThumb( 120 )
 			);
-			$dataSet->set(
-				FileRecord::FILE_EXTENSION,
-				$file->getExtension()
-			);
-			$dataSet->set(
-				FileRecord::MIME_MAJOR,
-				$file->getMimeType()
-			);
 			$actorId = $dataSet->get( FileRecord::FILE_AUTHOR_ID );
 			$dataSet->set(
 				FileRecord::FILE_AUTHOR_NAME,
