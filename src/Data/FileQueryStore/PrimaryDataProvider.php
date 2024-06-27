@@ -11,7 +11,8 @@ use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 class PrimaryDataProvider extends TitlePrimaryDataProvider {
 
 	private $dbFieldMapping = [
-		'timestamp' => 'img_timestamp'
+		'timestamp' => 'img_timestamp',
+		'title' => 'mti_title'
 	];
 
 	/**
