@@ -13,7 +13,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var array */
 	private $groups = [];
 	/** @var array */
-	private $blocks = [];
+	protected $blocks = [];
 
 	/** @var GlobalVarConfig */
 	protected $mwsgConfig;
@@ -140,6 +140,15 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	}
 
 	/**
+	 * @param string $userId
+	 *
+	 * @return bool
+	 */
+	protected function isUserBlocked( string $userId ) {
+		return isset( $this->blocks[$userId] );
+	}
+
+	/**
 	 * @param \stdClass $row
 	 *
 	 * @return void
@@ -152,7 +161,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			'user_registration' => $row->user_registration,
 			'user_editcount' => (int)$row->user_editcount,
 			'groups' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
-			'enabled' => isset( $this->blocks[$row->user_id] ) ? false : true,
+			'enabled' => $this->isUserBlocked( $row->user_id ),
 			// legacy fields
 			'display_name' => $row->user_real_name == null ? $row->user_name : $row->user_real_name,
 		];
