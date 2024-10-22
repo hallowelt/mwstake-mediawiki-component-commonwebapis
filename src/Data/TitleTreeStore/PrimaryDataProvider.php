@@ -201,7 +201,8 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		$parentRow->page_namespace = $row->page_namespace;
 		$parentRow->children = $this->getChildren(
 			$parentRow,
-			$this->makeRecord( $row, $uniqueId, !$fromQuery, !$fromQuery, )
+			$this->makeRecord( $row, $uniqueId, !$fromQuery, !$fromQuery, ),
+			$fromQuery
 		);
 		$this->insertParents( $parentRow, $this->getUniqueId( $parentRow ) );
 	}
@@ -209,10 +210,11 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/**
 	 * @param \stdClass $row
 	 * @param TitleTreeRecord|null $loadedChild
+	 * @param bool|null $fromQuery
 	 *
 	 * @return TitleTreeRecord[]
 	 */
-	private function getChildren( \stdClass $row, ?TitleTreeRecord $loadedChild ): array {
+	private function getChildren( \stdClass $row, ?TitleTreeRecord $loadedChild, $fromQuery = null ): array {
 		$childRows = $this->getSubpages( $row );
 		$children = $loadedChild ? [ $loadedChild ] : [];
 		foreach ( $childRows as $childRow ) {
@@ -221,6 +223,9 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				continue;
 			}
 			if ( !$this->isDirectChildOf( $row->page_title, $childRow->page_title ) ) {
+				continue;
+			}
+			if ( $fromQuery && strpos( $childRow->page_title, $this->query ) === false ) {
 				continue;
 			}
 			$child = $this->makeRecord( $childRow, $uniqueChildId, false, false );
