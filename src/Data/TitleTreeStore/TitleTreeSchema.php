@@ -32,6 +32,11 @@ class TitleTreeSchema extends TitleSchema {
 				self::FILTERABLE => false,
 				self::SORTABLE => false,
 				self::TYPE => FieldType::LISTVALUE
+			],
+			TitleTreeRecord::HAS_SUBPAGES => [
+				self::FILTERABLE => false,
+				self::SORTABLE => false,
+				self::TYPE => FieldType::BOOLEAN
 			]
 		] );
 	}

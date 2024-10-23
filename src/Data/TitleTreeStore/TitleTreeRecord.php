@@ -10,4 +10,5 @@ class TitleTreeRecord extends TitleRecord {
 	public const LOADED = 'loaded';
 	public const LEAF = 'leaf';
 	public const CHILDREN = 'children';
+	public const HAS_SUBPAGES = 'has_subpages';
 }
