@@ -129,7 +129,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			TitleTreeRecord::PAGE_TITLE => $row->page_title,
 			TitleTreeRecord::PAGE_DBKEY => $row->page_title,
 			TitleTreeRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
-			TitleTreeRecord::HAS_SUBPAGES => $this->nsInfo->hasSubpages( (int)$row->page_namespace ),
+			TitleTreeRecord::ALLOWS_SUBPAGES => $this->nsInfo->hasSubpages( (int)$row->page_namespace ),
 			TitleTreeRecord::LEAF => false,
 			TitleTreeRecord::EXPANDED => $expanded,
 			TitleTreeRecord::LOADED => $loaded,
