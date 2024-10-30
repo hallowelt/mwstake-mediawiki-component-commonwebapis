@@ -63,7 +63,8 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	protected function appendRowToData( \stdClass $row ) {
 		$indexTitle = $row->mti_title;
 		$uniqueId = $this->getUniqueId( $row );
-		if ( $this->isSubpage( $indexTitle ) ) {
+		if ( $this->isSubpage( $indexTitle ) &&
+			$this->nsInfo->hasSubpages( (int)$row->page_namespace ) ) {
 			if (
 				$this->queryMatchesSubpage( $indexTitle )
 			) {
@@ -128,6 +129,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			TitleTreeRecord::PAGE_TITLE => $row->page_title,
 			TitleTreeRecord::PAGE_DBKEY => $row->page_title,
 			TitleTreeRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
+			TitleTreeRecord::ALLOWS_SUBPAGES => $this->nsInfo->hasSubpages( (int)$row->page_namespace ),
 			TitleTreeRecord::LEAF => false,
 			TitleTreeRecord::EXPANDED => $expanded,
 			TitleTreeRecord::LOADED => $loaded,
