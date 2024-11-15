@@ -4,12 +4,17 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
 use MediaWiki\MediaWikiServices;
 
-class PopulateTitleIndex extends \Maintenance {
+$maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';
+if ( file_exists( $maintPath ) ) {
+	require_once $maintPath;
+}
+
+class PopulateTitleIndex extends \LoggedUpdateMaintenance {
 	/**
 	 * @return bool
 	 */
-	public function execute() {
-		$db = $this->getDB( DB_REPLICA );
+	public function doDBUpdates() {
+		$db = $this->getDB( DB_PRIMARY );
 		$db->delete( 'mws_title_index', '*', __METHOD__ );
 
 		$titles = $db->select(
@@ -58,4 +63,14 @@ class PopulateTitleIndex extends \Maintenance {
 			[ 'IGNORE' ]
 		);
 	}
+
+	/**
+	 * @return string
+	 */
+	protected function getUpdateKey() {
+		return 'mws-title-index-init';
+	}
 }
+
+$maintClass = PopulateTitleIndex::class;
+require_once RUN_MAINTENANCE_IF_MAIN;

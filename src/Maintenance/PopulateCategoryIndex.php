@@ -4,12 +4,16 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
 use LoggedUpdateMaintenance;
 
-class PopulateCategoryIndex extends \Maintenance {
+$maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';
+if ( file_exists( $maintPath ) ) {
+	require_once $maintPath;
+}
+class PopulateCategoryIndex extends \LoggedUpdateMaintenance {
 	/**
 	 * @return bool
 	 */
-	public function execute() {
-		$db = $this->getDB( DB_REPLICA );
+	public function doDBUpdates() {
+		$db = $this->getDB( DB_PRIMARY );
 		$db->delete( 'mws_category_index', '*', __METHOD__ );
 		
 		$links = $db->select(
@@ -56,4 +60,14 @@ class PopulateCategoryIndex extends \Maintenance {
 			[ 'IGNORE' ]
 		);
 	}
+
+	/**
+	 * @return string
+	 */
+	protected function getUpdateKey() {
+		return 'mws-category-index-init';
+	}
 }
+
+$maintClass = PopulateCategoryIndex::class;
+require_once RUN_MAINTENANCE_IF_MAIN;
