@@ -6,6 +6,7 @@ Provides various web APIs (Action API and REST).
 **This code is meant to be executed within the MediaWiki application context. No standalone usage is intended.**
 
 ## Compatibility
+- `3.0.x` -> MediaWiki 1.43
 - `2.0.x` -> MediaWiki 1.39
 - `1.0.x` -> MediaWiki 1.35
 
