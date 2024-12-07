@@ -3,7 +3,6 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
 use GlobalVarConfig;
-use MediaWiki\Message\Message;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -49,29 +48,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/**
 	 * @return array
 	 */
-	public function getGroupBuckets(): array {
-		$groupBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeGroups' );
-		$res = $this->db->select(
-			'user_groups',
-			[ 'DISTINCT ug_group' ],
-			[
-				'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')',
-			],
-			__METHOD__,
-			[ 'GROUP BY' => 'ug_group' ]
-		);
-		$groups = [];
-		foreach ( $res as $row ) {
-			$msg = Message::newFromKey( 'group-' . $row->ug_group );
-			$groups[$row->ug_group] = $msg->exists() ? $msg->text() : $row->ug_group;
-		}
-
-		return $groups;
-	}
-
-	/**
-	 * @return array
-	 */
 	private function getGroups() {
 		$groupBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeGroups' );
 		$res = $this->db->select(
@@ -93,17 +69,10 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @return array
 	 */
 	private function getBlocks() {
-		$res = $this->db->select(
-			[ 'b' => 'block', 'bt' => 'block_target' ],
-			[ 'bt_user' ],
-			[],
-			__METHOD__,
-			[],
-			[ 'b' => [ 'INNER JOIN', 'bt.bt_id = b.bl_target' ] ]
-		);
 		$blocks = [];
-		foreach ( $res as $row ) {
-			$blocks[] = (int)$row->bt_user;
+		$blocksRes = $this->db->select( 'ipblocks', '*', '', __METHOD__ );
+		foreach ( $blocksRes as $row ) {
+			$blocks[$row->ipb_user] = $row->ipb_address;
 		}
 
 		return $blocks;
@@ -167,16 +136,16 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @inheritDoc
 	 */
 	protected function skipPreFilter( Filter $filter ) {
-		return $filter->getField() === 'user_name' || $filter->getField() === 'enabled';
+		return $filter->getField() === 'user_name';
 	}
 
 	/**
-	 * @param int $userId
+	 * @param string $userId
 	 *
 	 * @return bool
 	 */
-	protected function isUserBlocked( int $userId ) {
-		return in_array( (int)$userId, $this->blocks );
+	protected function isUserBlocked( string $userId ) {
+		return isset( $this->blocks[$userId] );
 	}
 
 	/**
@@ -191,9 +160,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			'user_real_name' => $row->user_real_name,
 			'user_registration' => $row->user_registration,
 			'user_editcount' => (int)$row->user_editcount,
-			'user_email' => $row->user_email,
 			'groups' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
-			'enabled' => !$this->isUserBlocked( (int)$row->user_id ),
+			'enabled' => !$this->isUserBlocked( $row->user_id ),
 			// legacy fields
 			'display_name' => $row->user_real_name == null ? $row->user_name : $row->user_real_name,
 		];
