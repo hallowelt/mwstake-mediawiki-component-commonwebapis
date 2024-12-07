@@ -12,7 +12,7 @@ use Wikimedia\ParamValidator\ParamValidator;
 
 abstract class QueryStore extends Handler {
 	/** @var HookContainer */
-	private $hookContainer;
+	protected $hookContainer;
 
 	/**
 	 * @param HookContainer $hookContainer
@@ -100,7 +100,7 @@ abstract class QueryStore extends Handler {
 	 *
 	 * @return false|string
 	 */
-	private function encodeJson( $data ) {
+	protected function encodeJson( $data ) {
 		return json_encode( $data, $this->getFormat() === 'jsonfm' ? JSON_PRETTY_PRINT : 0 );
 	}
 
