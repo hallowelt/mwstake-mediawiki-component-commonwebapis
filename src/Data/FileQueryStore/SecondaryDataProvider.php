@@ -61,6 +61,18 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 				FileRecord::FILE_THUMBNAIL_URL_PREVIEW,
 				$file->createThumb( 120 )
 			);
+			$dataSet->set(
+				FileRecord::FILE_MEDIATYPE,
+				$file->getMediaType()
+			);
+			$dataSet->set(
+				FileRecord::FILE_WIDTH,
+				$file->getWidth()
+			);
+			$dataSet->set(
+				FileRecord::FILE_HEIGHT,
+				$file->getHeight()
+			);
 		}
 
 		return $dataSets;

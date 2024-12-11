@@ -39,6 +39,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$filters = $params->getFilter();
 		$conds = parent::makePreFilterConds( $params );
 		$query = $params->getQuery();
+		$nsFilter = [];
 		foreach ( $filters as $filter ) {
 			if (
 				in_array( $filter->getField(), [
@@ -50,6 +51,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 					$query = $filter->getValue();
 				}
 			}
+
  			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
@@ -58,16 +60,27 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 						Filter::KEY_COMPARISON => 'in'
 					] );
 				}
-				$conds[] = 'mti_namespace IN (' . $this->db->makeList( $filter->getValue() ) . ')';
+				$nsFilter = array_merge( $nsFilter, $filter->getValue() );
 				$filter->setApplied( true );
 			}
 
 			if ( $filter->getField() === TitleRecord::IS_CONTENT_PAGE ) {
 				if ( $filter->getValue() ) {
-					$conds[] = 'mti_namespace IN (' . $this->db->makeList( $this->contentNamespaces ) . ')';
+					$nsFilter = array_merge( $nsFilter, $this->contentNamespaces );
 				} else {
 					$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $this->contentNamespaces ) . ')';
 				}
+			}
+			if ( $filter->getField() === TitleRecord::PAGE_CONTENT_MODEL ) {
+				if ( !( $filter instanceof Filter\ListValue ) ) {
+					$filter = new Filter\StringValue( [
+						Filter::KEY_FIELD => TitleRecord::PAGE_CONTENT_MODEL,
+						Filter::KEY_VALUE => [ $filter->getValue() ],
+						Filter::KEY_COMPARISON => 'in'
+					] );
+				}
+				$filter->setApplied( true );
+				$conds[] = 'page_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
 			}
 		}
 
@@ -80,6 +93,10 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				$this->db->anyString(), $query, $this->db->anyString()
 			);
 			$conds[] = "($titleQuery OR $displayTitleQuery)";
+		}
+
+		if ( !empty( $nsFilter ) ) {
+			$conds[] = 'mti_namespace IN (' . $this->db->makeList( $nsFilter ) . ')';
 		}
 
 		return $conds;

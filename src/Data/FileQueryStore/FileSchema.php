@@ -62,7 +62,22 @@ class FileSchema extends TitleSchema {
 				self::FILTERABLE => false,
 				self::SORTABLE => false,
 				self::TYPE => FieldType::STRING
-			]
+			],
+			FileRecord::FILE_MEDIATYPE => [
+				self::FILTERABLE => false,
+				self::SORTABLE => false ,
+				self::TYPE => FieldType::STRING
+			],
+			FileRecord::FILE_HEIGHT => [
+				self::FILTERABLE => false,
+				self::SORTABLE => false ,
+				self::TYPE => FieldType::INT
+			],
+			FileRecord::FILE_WIDTH => [
+				self::FILTERABLE => false,
+				self::SORTABLE => false ,
+				self::TYPE => FieldType::INT
+			],
 		] );
 	}
 }
