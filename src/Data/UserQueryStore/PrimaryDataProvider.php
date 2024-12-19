@@ -119,23 +119,13 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$conds = parent::makePreFilterConds( $params );
 		$query = $params->getQuery();
 		foreach ( $filters as $filter ) {
-			if ( $filter->getField() === 'user_name' ) {
-				// Usernames are stored with spaces in the query table
-				$filterValue = str_replace( '_', ' ', $filter->getValue() );
-				if (
-					$filter->getComparison() === Filter::COMPARISON_CONTAINS ||
-					$filter->getComparison() === Filter::COMPARISON_LIKE
-				) {
-					$query = $filterValue;
-				} elseif ( $filter->getComparison() === Filter::COMPARISON_EQUALS ) {
-					$conds['user_name'] = $filterValue;
-				} elseif ( $filter->getComparison() === Filter::COMPARISON_NOT_EQUALS ) {
-					$conds['user_name NOT'] = $filterValue;
-				}
+			if ( $filter->getField() === 'user_name' || $filter->getField() == 'user_real_name' ) {
+				// Incompatible with query, takes priority
+				$query = '';
+				$this->addIndexedNameFilter( $filter, $conds );
 				$filter->setApplied( true );
 			}
 		}
-
 		if ( $query !== '' ) {
 			$query = mb_strtolower( $query );
 			$conds[] = $this->db->makeList(
@@ -164,10 +154,38 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	}
 
 	/**
+	 * @param Filter $filter
+	 * @param array &$conds
+	 * @return void
+	 */
+	private function addIndexedNameFilter( Filter $filter, array &$conds ) {
+		$fieldMapping = [
+			'user_name' => 'mui_user_name',
+			'user_real_name' => 'mui_user_real_name'
+		];
+		$filterValue = str_replace( '_', ' ', $filter->getValue() );
+		if (
+			$filter->getComparison() === Filter::COMPARISON_CONTAINS ||
+			$filter->getComparison() === Filter::COMPARISON_LIKE
+		) {
+			$field = $fieldMapping[$filter->getField()];
+			$conds[] = "$field " . $this->db->buildLike(
+				$this->db->anyString(), $filterValue, $this->db->anyString()
+			);
+		} elseif ( $filter->getComparison() === Filter::COMPARISON_EQUALS ) {
+			$conds[$filter->getField()] = $filterValue;
+		} elseif ( $filter->getComparison() === Filter::COMPARISON_NOT_EQUALS ) {
+			$conds[$filter->getField()] = $filterValue;
+		}
+	}
+
+	/**
 	 * @inheritDoc
 	 */
 	protected function skipPreFilter( Filter $filter ) {
-		return $filter->getField() === 'user_name' || $filter->getField() === 'enabled';
+		return $filter->getField() === 'user_name' ||
+			$filter->getField() === 'user_real_name' ||
+			$filter->getField() === 'enabled';
 	}
 
 	/**
