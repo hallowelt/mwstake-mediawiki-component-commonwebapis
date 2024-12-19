@@ -211,6 +211,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			'user_editcount' => (int)$row->user_editcount,
 			'user_email' => $row->user_email,
 			'groups' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
+			'groups_raw' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
 			'enabled' => !$this->isUserBlocked( (int)$row->user_id ),
 			// legacy fields
 			'display_name' => $row->user_real_name == null ? $row->user_name : $row->user_real_name,
