@@ -3,11 +3,12 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
 use MediaWiki\Title\Title;
+use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\Record;
 
 class SecondaryDataProvider implements ISecondaryDataProvider {
-	/** @var \TitleFactory */
+	/** @var TitleFactory */
 	protected $titleFactory;
 	/** @var \Language */
 	protected $language;
@@ -15,7 +16,7 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 	protected $pageProps;
 
 	/**
-	 * @param \TitleFactory $titleFactory
+	 * @param TitleFactory $titleFactory
 	 * @param \Language $language
 	 * @param \PageProps $pageProps
 	 */

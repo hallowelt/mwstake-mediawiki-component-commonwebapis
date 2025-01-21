@@ -4,6 +4,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
 use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Message\Message;
+use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
 use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
 
@@ -12,13 +13,13 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 	protected $userFactory;
 	/** @var LinkRenderer */
 	protected $linkRenderer;
-	/** @var \TitleFactory */
+	/** @var TitleFactory */
 	protected $titleFactory;
 
 	/**
 	 * @param UserFactory $userFactory
 	 * @param LinkRenderer $linkRenderer
-	 * @param \TitleFactory $titleFactory
+	 * @param TitleFactory $titleFactory
 	 */
 	public function __construct( $userFactory, $linkRenderer, $titleFactory ) {
 		$this->userFactory = $userFactory;
