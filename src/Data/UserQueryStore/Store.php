@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
 use GlobalVarConfig;
+use MediaWiki\Config\Config;
 use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
@@ -18,7 +19,7 @@ class Store implements IStore {
 	protected $linkRenderer;
 	/** @var TitleFactory */
 	protected $titleFactory;
-	/** @var \Config */
+	/** @var Config */
 	protected $mwsgConfig;
 
 	/**
