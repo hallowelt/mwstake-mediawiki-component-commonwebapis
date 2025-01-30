@@ -51,6 +51,13 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				}, $extensions ), LIST_OR );
 				$filter->setApplied( true );
 			}
+			if ( $filter->getField() === FileRecord::FILE_SIZE ) {
+				$filterValue = $filter->getValue();
+				if ( !is_array( $filterValue ) ) {
+					$filterValue = [ $filterValue ];
+				}
+				$filter->setApplied( true );
+			}
 		}
 		return $conds;
 	}
@@ -103,6 +110,14 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				'field' => 'actor_name',
 				'value' => $users,
 				'comparison' => Filter\ListValue::COMPARISON_IN
+			] );
+		}
+		if ( $filter->getField() === FileRecord::FILE_SIZE ) {
+			$filterValue = $filter->getValue();
+			$filter = new Filter\NumericValue( [
+				Filter::KEY_FIELD => 'img_size',
+				Filter::KEY_VALUE => $filterValue,
+				Filter::KEY_COMPARISON => $filter->getComparison()
 			] );
 		}
 		parent::appendPreFilterCond( $conds, $filter );
