@@ -13,7 +13,8 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	private $dbFieldMapping = [
 		'timestamp' => 'img_timestamp',
 		'title' => 'mti_title',
-		'file_size' => 'img_size'
+		'file_size' => 'img_size',
+		'file_extension' => 'img_minor_mime',
 	];
 
 	/**
