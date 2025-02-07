@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
 use MediaWiki\Language\Language;
+use MediaWiki\Page\PageProps;
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\IStore;
@@ -17,7 +18,7 @@ class Store implements IStore {
 	protected $language;
 	/** @var NamespaceInfo */
 	protected $nsInfo;
-	/** @var \PageProps */
+	/** @var PageProps */
 	protected $pageProps;
 
 	/**
@@ -25,11 +26,11 @@ class Store implements IStore {
 	 * @param TitleFactory $titleFactory
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
-	 * @param \PageProps $pageProps
+	 * @param PageProps $pageProps
 	 */
 	public function __construct(
 		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
-		NamespaceInfo $nsInfo, \PageProps $pageProps
+		NamespaceInfo $nsInfo, PageProps $pageProps
 	) {
 		$this->lb = $lb;
 		$this->titleFactory = $titleFactory;

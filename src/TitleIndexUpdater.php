@@ -8,11 +8,11 @@ use MediaWiki\Hook\PageMoveCompleteHook;
 use MediaWiki\Page\Hook\ArticleUndeleteHook;
 use MediaWiki\Page\Hook\PageDeleteCompleteHook;
 use MediaWiki\Page\PageIdentity;
+use MediaWiki\Page\PageProps;
 use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
-use PageProps;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleIndexUpdater implements
