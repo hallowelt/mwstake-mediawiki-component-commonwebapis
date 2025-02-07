@@ -12,7 +12,9 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 
 	private $dbFieldMapping = [
 		'timestamp' => 'img_timestamp',
-		'title' => 'mti_title'
+		'title' => 'mti_title',
+		'file_size' => 'img_size',
+		'file_extension' => 'img_minor_mime',
 	];
 
 	/**
@@ -48,6 +50,13 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				$conds[] = $this->db->makeList( array_map( static function ( $extension ) {
 					return 'mti_title LIKE "%.' . trim( strtolower( $extension ) ) . '"';
 				}, $extensions ), LIST_OR );
+				$filter->setApplied( true );
+			}
+			if ( $filter->getField() === FileRecord::FILE_SIZE ) {
+				$filterValue = $filter->getValue();
+				if ( !is_array( $filterValue ) ) {
+					$filterValue = [ $filterValue ];
+				}
 				$filter->setApplied( true );
 			}
 		}
@@ -104,6 +113,14 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				'comparison' => Filter\ListValue::COMPARISON_IN
 			] );
 		}
+		if ( $filter->getField() === FileRecord::FILE_SIZE ) {
+			$filterValue = $filter->getValue();
+			$filter = new Filter\NumericValue( [
+				Filter::KEY_FIELD => 'img_size',
+				Filter::KEY_VALUE => $filterValue,
+				Filter::KEY_COMPARISON => $filter->getComparison()
+			] );
+		}
 		parent::appendPreFilterCond( $conds, $filter );
 	}
 
@@ -114,7 +131,8 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 		return array_merge(
 			parent::getFields(), [
 				'img_actor', 'img_major_mime', 'img_minor_mime', 'actor_name',
-				'comment_text', "GROUP_CONCAT( cl_to SEPARATOR '|') categories", 'img_timestamp'
+				'comment_text', "GROUP_CONCAT( cl_to SEPARATOR '|') categories",
+				'img_timestamp', 'img_size'
 			] );
 	}
 
@@ -144,6 +162,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 			TitleRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
 			FileRecord::FILE_TIMESTAMP => $row->img_timestamp,
 			FileRecord::FILE_EXTENSION => $this->getExtension( $row->page_title ),
+			FileRecord::FILE_SIZE => $row->img_size,
 			FileRecord::MIME_MAJOR => $row->img_major_mime,
 			FileRecord::MIME_MINOR => $row->img_minor_mime,
 			FileRecord::FILE_AUTHOR_ID => $row->img_actor,
