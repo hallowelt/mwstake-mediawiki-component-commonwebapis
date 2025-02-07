@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\FileQueryStore;
 
+use MediaWiki\Language\Language;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use Wikimedia\Rdbms\ILoadBalancer;
@@ -11,7 +12,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	protected $lb;
 	/** @var TitleFactory */
 	protected $titleFactory;
-	/** @var \Language */
+	/** @var Language */
 	protected $language;
 	/** @var \NamespaceInfo */
 	protected $nsInfo;
@@ -23,13 +24,13 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	/**
 	 * @param ILoadBalancer $lb
 	 * @param TitleFactory $titleFactory
-	 * @param \Language $language
+	 * @param Language $language
 	 * @param \NamespaceInfo $nsInfo
 	 * @param \PageProps $pageProps
 	 * @param \RepoGroup $repoGroup
 	 */
 	public function __construct(
-		ILoadBalancer $lb, TitleFactory $titleFactory, \Language $language,
+		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
 		\NamespaceInfo $nsInfo, \PageProps $pageProps, \RepoGroup $repoGroup
 	) {
 		parent::__construct();

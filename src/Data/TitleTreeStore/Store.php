@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
+use MediaWiki\Language\Language;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
@@ -11,7 +12,7 @@ class Store implements IStore {
 	protected $lb;
 	/** @var TitleFactory */
 	protected $titleFactory;
-	/** @var \Language */
+	/** @var Language */
 	protected $language;
 	/** @var \NamespaceInfo */
 	protected $nsInfo;
@@ -21,12 +22,12 @@ class Store implements IStore {
 	/**
 	 * @param ILoadBalancer $lb
 	 * @param TitleFactory $titleFactory
-	 * @param \Language $language
+	 * @param Language $language
 	 * @param \NamespaceInfo $nsInfo
 	 * @param \PageProps $pageProps
 	 */
 	public function __construct(
-		ILoadBalancer $lb, TitleFactory $titleFactory, \Language $language,
+		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
 		\NamespaceInfo $nsInfo, \PageProps $pageProps
 	) {
 		$this->lb = $lb;

@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
+use MediaWiki\Language\Language;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -10,7 +11,7 @@ use Wikimedia\Rdbms\IDatabase;
 
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
-	/** @var \Language */
+	/** @var Language */
 	protected $language;
 
 	/** @var array */
@@ -19,11 +20,11 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
-	 * @param \Language $language
+	 * @param Language $language
 	 * @param \NamespaceInfo $nsInfo
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, \Language $language, \NamespaceInfo $nsInfo
+		IDatabase $db, Schema $schema, Language $language, \NamespaceInfo $nsInfo
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;

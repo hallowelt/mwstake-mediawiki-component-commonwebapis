@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
+use MediaWiki\Language\Language;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use Wikimedia\Rdbms\ILoadBalancer;
@@ -11,7 +12,7 @@ class Reader extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryS
 	protected $lb;
 	/** @var TitleFactory */
 	protected $titleFactory;
-	/** @var \Language */
+	/** @var Language */
 	protected $language;
 	/** @var \NamespaceInfo */
 	protected $nsInfo;
