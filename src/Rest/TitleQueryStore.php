@@ -4,6 +4,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Language\Language;
+use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\Store;
 use MWStake\MediaWiki\Component\DataStore\IStore;
@@ -16,7 +17,7 @@ class TitleQueryStore extends QueryStore {
 	protected $titleFactory;
 	/** @var Language */
 	protected $language;
-	/** @var \NamespaceInfo */
+	/** @var NamespaceInfo */
 	protected $nsInfo;
 	/** @var \PageProps */
 	protected $pageProps;
@@ -26,12 +27,12 @@ class TitleQueryStore extends QueryStore {
 	 * @param ILoadBalancer $lb
 	 * @param TitleFactory $titleFactory
 	 * @param Language $language
-	 * @param \NamespaceInfo $nsInfo
+	 * @param NamespaceInfo $nsInfo
 	 * @param \PageProps $pageProps
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, \NamespaceInfo $nsInfo, \PageProps $pageProps
+		Language $language, NamespaceInfo $nsInfo, \PageProps $pageProps
 	) {
 		parent::__construct( $hookContainer );
 		$this->lb = $lb;

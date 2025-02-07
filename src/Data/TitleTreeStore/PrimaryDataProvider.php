@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
 use MediaWiki\Language\Language;
+use MediaWiki\Title\NamespaceInfo;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\DataStore\Schema;
 use Wikimedia\Rdbms\IDatabase;
@@ -13,13 +14,13 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var array|null */
 	private $expandPaths = null;
 
-	/** @var \NamespaceInfo */
+	/** @var NamespaceInfo */
 	private $nsInfo;
 
 	/**
 	 * @inheritDoc
 	 */
-	public function __construct( IDatabase $db, Schema $schema, Language $language, \NamespaceInfo $nsInfo ) {
+	public function __construct( IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo ) {
 		parent::__construct( $db, $schema, $language, $nsInfo );
 		$this->nsInfo = $nsInfo;
 	}
