@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
+use MediaWiki\Maintenance\LoggedUpdateMaintenance;
 use MediaWiki\MediaWikiServices;
 
 $maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';
@@ -9,7 +10,7 @@ if ( file_exists( $maintPath ) ) {
 	require_once $maintPath;
 }
 
-class PopulateTitleIndex extends \LoggedUpdateMaintenance {
+class PopulateTitleIndex extends LoggedUpdateMaintenance {
 	/**
 	 * @return bool
 	 */

@@ -2,13 +2,13 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
-use LoggedUpdateMaintenance;
+use MediaWiki\Maintenance\LoggedUpdateMaintenance;
 
 $maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';
 if ( file_exists( $maintPath ) ) {
 	require_once $maintPath;
 }
-class PopulateCategoryIndex extends \LoggedUpdateMaintenance {
+class PopulateCategoryIndex extends LoggedUpdateMaintenance {
 	/**
 	 * @return bool
 	 */
