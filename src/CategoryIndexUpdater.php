@@ -2,8 +2,8 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs;
 
-use Category;
 use ManualLogEntry;
+use MediaWiki\Category\Category;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
 use MediaWiki\Page\Hook\ArticleUndeleteHook;
