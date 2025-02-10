@@ -2,7 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
-use GlobalVarConfig;
+use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Rest\Response;

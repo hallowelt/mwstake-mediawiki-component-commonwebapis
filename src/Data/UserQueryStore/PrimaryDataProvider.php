@@ -2,7 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
-use GlobalVarConfig;
+use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\Message\Message;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;

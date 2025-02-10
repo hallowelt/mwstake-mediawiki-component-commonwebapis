@@ -2,8 +2,8 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
-use GlobalVarConfig;
 use MediaWiki\Config\Config;
+use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
