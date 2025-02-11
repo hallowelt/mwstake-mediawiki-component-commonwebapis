@@ -6,10 +6,10 @@ use ManualLogEntry;
 use MediaWiki\Category\Category;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
-use MediaWiki\Page\Hook\ArticleUndeleteHook;
 use MediaWiki\Page\Hook\CategoryAfterPageAddedHook;
 use MediaWiki\Page\Hook\CategoryAfterPageRemovedHook;
 use MediaWiki\Page\Hook\PageDeleteCompleteHook;
+use MediaWiki\Page\Hook\PageUndeleteCompleteHook;
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
@@ -23,7 +23,7 @@ class CategoryIndexUpdater implements
 	PageSaveCompleteHook,
 	PageMoveCompleteHook,
 	PageDeleteCompleteHook,
-	ArticleUndeleteHook,
+	PageUndeleteCompleteHook,
 	AfterImportPageHook
 {
 
@@ -65,9 +65,18 @@ class CategoryIndexUpdater implements
 	/**
 	 * @inheritDoc
 	 */
-	public function onArticleUndelete( $title, $create, $comment, $oldPageId, $restoredPages ) {
-		if ( $title->getNamespace() === NS_CATEGORY ) {
-			$this->updateForPage( $title );
+	public function onPageUndeleteComplete(
+		ProperPageIdentity $page,
+		Authority $restorer,
+		string $reason,
+		RevisionRecord $restoredRev,
+		ManualLogEntry $logEntry,
+		int $restoredRevisionCount,
+		bool $created,
+		array $restoredPageIds
+	): void {
+		if ( $page->getNamespace() === NS_CATEGORY ) {
+			$this->updateForPage( $page );
 		}
 	}
 
