@@ -1,5 +1,7 @@
 <?php
 
+use MediaWiki\Installer\DatabaseUpdater;
+
 if ( defined( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION' ) ) {
 	return;
 }
