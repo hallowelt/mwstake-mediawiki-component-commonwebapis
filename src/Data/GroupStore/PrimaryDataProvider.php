@@ -56,7 +56,7 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 				'additional_group' => ( $this->groupHelper->getGroupType( $group ) === 'custom' ),
 				'group_type' => $this->groupHelper->getGroupType( $group ),
 				'displayname' => $displayName,
-				'usercount' => $this->groupHelper->countUsersInGroup( $group )
+				'usercount' => $this->groupHelper->countUsersInGroup( $group, true, true )
 			] );
 		}
 		return $data;
