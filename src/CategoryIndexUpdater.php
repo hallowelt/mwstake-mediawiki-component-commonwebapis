@@ -164,7 +164,7 @@ class CategoryIndexUpdater implements
 	 * @return void
 	 */
 	private function insert( array $info ) {
-		$dbw = $this->lb->getConnectionRef( DB_PRIMARY );
+		$dbw = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$dbw->tableExists( 'mws_category_index' ) ) {
 			return;
 		}
