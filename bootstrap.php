@@ -69,8 +69,8 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 			$hookContainer->register( 'PageMoveComplete', [ $categoryIndexUpdater, 'onPageMoveComplete' ] );
 			$hookContainer->register( 'PageDeleteComplete', [ $titleIndexUpdater, 'onPageDeleteComplete' ] );
 			$hookContainer->register( 'PageDeleteComplete', [ $categoryIndexUpdater, 'onPageDeleteComplete' ] );
-			$hookContainer->register( 'ArticleUndelete', [ $titleIndexUpdater, 'onArticleUndelete' ] );
-			$hookContainer->register( 'ArticleUndelete', [ $categoryIndexUpdater, 'onArticleUndelete' ] );
+			$hookContainer->register( 'PageUndeleteComplete', [ $titleIndexUpdater, 'onPageUndeleteComplete' ] );
+			$hookContainer->register( 'PageUndeleteComplete', [ $categoryIndexUpdater, 'onPageUndeleteComplete' ] );
 			$hookContainer->register( 'AfterImportPage', [ $titleIndexUpdater, 'onAfterImportPage' ] );
 			$hookContainer->register( 'AfterImportPage', [ $categoryIndexUpdater, 'onAfterImportPage' ] );
 			$hookContainer->register( 'CategoryAfterPageAdded', [ $categoryIndexUpdater, 'onCategoryAfterPageAdded' ] );
