@@ -26,7 +26,7 @@ class UserIndexUpdater {
 	 */
 	public function store( User $user ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_user_index' ) ) {
+		if ( !$db->tableExists( 'mws_user_index', __METHOD__ ) ) {
 			return false;
 		}
 		$data = [
@@ -50,7 +50,7 @@ class UserIndexUpdater {
 	 */
 	public function delete( User $user ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_user_index' ) ) {
+		if ( !$db->tableExists( 'mws_user_index', __METHOD__ ) ) {
 			return false;
 		}
 

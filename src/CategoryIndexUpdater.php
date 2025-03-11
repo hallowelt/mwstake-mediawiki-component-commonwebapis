@@ -129,7 +129,7 @@ class CategoryIndexUpdater implements
 	 */
 	private function delete( string $categoryKey ) {
 		$dbw = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$dbw->tableExists( 'mws_category_index' ) ) {
+		if ( !$dbw->tableExists( 'mws_category_index', __METHOD__ ) ) {
 			return;
 		}
 		$dbw->delete( 'mws_category_index', [
@@ -165,7 +165,7 @@ class CategoryIndexUpdater implements
 	 */
 	private function insert( array $info ) {
 		$dbw = $this->lb->getConnectionRef( DB_PRIMARY );
-		if ( !$dbw->tableExists( 'mws_category_index' ) ) {
+		if ( !$dbw->tableExists( 'mws_category_index', __METHOD__ ) ) {
 			return;
 		}
 		$dbw->insert( 'mws_category_index', $info, __METHOD__, [ 'IGNORE' ] );
