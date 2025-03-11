@@ -5,8 +5,8 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs;
 use ManualLogEntry;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
-use MediaWiki\Page\Hook\ArticleUndeleteHook;
 use MediaWiki\Page\Hook\PageDeleteCompleteHook;
+use MediaWiki\Page\Hook\PageUndeleteCompleteHook;
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Page\ProperPageIdentity;
@@ -19,7 +19,7 @@ class TitleIndexUpdater implements
 	PageSaveCompleteHook,
 	PageMoveCompleteHook,
 	PageDeleteCompleteHook,
-	ArticleUndeleteHook,
+	PageUndeleteCompleteHook,
 	AfterImportPageHook
 {
 
@@ -72,8 +72,17 @@ class TitleIndexUpdater implements
 	/**
 	 * @inheritDoc
 	 */
-	public function onArticleUndelete( $title, $create, $comment, $oldPageId, $restoredPages ) {
-		$this->insert( $title, $oldPageId );
+	public function onPageUndeleteComplete(
+		ProperPageIdentity $page,
+		Authority $restorer,
+		string $reason,
+		RevisionRecord $restoredRev,
+		ManualLogEntry $logEntry,
+		int $restoredRevisionCount,
+		bool $created,
+		array $restoredPageIds
+	): void {
+		$this->insert( $page, $page->getId() );
 	}
 
 	/**
@@ -91,7 +100,7 @@ class TitleIndexUpdater implements
 	 */
 	private function insert( PageIdentity $page, $forceId = null ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_title_index' ) ) {
+		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
 			return false;
 		}
 		if ( !$page->exists() ) {
@@ -128,7 +137,7 @@ class TitleIndexUpdater implements
 	private function delete( int $namespace, string $title ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_title_index' ) ) {
+		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
 			return false;
 		}
 		return $db->delete(
