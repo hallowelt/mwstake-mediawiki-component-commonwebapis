@@ -41,7 +41,14 @@ class TitleTreeStore extends TitleQueryStore {
 	 * @return IStore
 	 */
 	protected function getStore(): IStore {
-		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps, $this->permissionManager );
+		return new Store(
+			$this->lb,
+			$this->titleFactory,
+			$this->language,
+			$this->nsInfo,
+			$this->pageProps,
+			$this->permissionManager
+		);
 	}
 
 	/**

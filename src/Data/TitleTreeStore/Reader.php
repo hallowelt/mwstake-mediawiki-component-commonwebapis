@@ -45,7 +45,11 @@ class Reader extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryS
 	 */
 	public function makePrimaryDataProvider( $params ) {
 		return new PrimaryDataProvider(
-			$this->lb->getConnection( DB_REPLICA ), $this->getSchema(), $this->language, $this->nsInfo, $this->permissionManager
+			$this->lb->getConnection( DB_REPLICA ),
+			$this->getSchema(),
+			$this->language,
+			$this->nsInfo,
+			$this->permissionManager
 		);
 	}
 
