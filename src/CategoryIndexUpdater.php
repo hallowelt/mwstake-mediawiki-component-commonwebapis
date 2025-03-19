@@ -141,9 +141,11 @@ class CategoryIndexUpdater implements
 		if ( !$dbw->tableExists( 'mws_category_index', __METHOD__ ) ) {
 			return;
 		}
-		$dbw->delete( 'mws_category_index', [
-			'mci_title' => mb_strtolower( str_replace( '_', ' ', $categoryKey ) )
-		] );
+		$dbw->delete(
+			'mws_category_index',
+			[ 'mci_title' => mb_strtolower( str_replace( '_', ' ', $categoryKey ) ) ],
+			__METHOD__
+		);
 	}
 
 	/**
