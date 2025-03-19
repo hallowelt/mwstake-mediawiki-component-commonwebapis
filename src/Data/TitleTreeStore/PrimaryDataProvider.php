@@ -385,6 +385,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				'page_namespace' => $row->page_namespace,
 				'page_title' => $title
 			],
+			__METHOD__
 		);
 	}
 
@@ -429,6 +430,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				'page_namespace' => $namespace,
 				'page_title' => $matches[0]
 			],
+			__METHOD__
 		);
 
 		if ( !$exists ) {
