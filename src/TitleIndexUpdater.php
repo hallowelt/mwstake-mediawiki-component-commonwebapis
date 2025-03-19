@@ -13,6 +13,7 @@ use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
+use Wikimedia\Rdbms\DBConnRef;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleIndexUpdater implements
@@ -99,6 +100,7 @@ class TitleIndexUpdater implements
 	 * @return bool
 	 */
 	private function insert( PageIdentity $page, $forceId = null ) {
+		/** @var DBConnRef $db */
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
 			return false;
@@ -135,7 +137,7 @@ class TitleIndexUpdater implements
 	 * @return bool
 	 */
 	private function delete( int $namespace, string $title ) {
-		$db = $this->lb->getConnection( DB_PRIMARY );
+		/** @var DBConnRef $db */
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
 			return false;

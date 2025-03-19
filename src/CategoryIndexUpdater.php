@@ -15,6 +15,7 @@ use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
+use Wikimedia\Rdbms\DBConnRef;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class CategoryIndexUpdater implements
@@ -137,6 +138,7 @@ class CategoryIndexUpdater implements
 	 * @return void
 	 */
 	private function delete( string $categoryKey ) {
+		/** @var DBConnRef $dbw */
 		$dbw = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$dbw->tableExists( 'mws_category_index', __METHOD__ ) ) {
 			return;
@@ -175,6 +177,7 @@ class CategoryIndexUpdater implements
 	 * @return void
 	 */
 	private function insert( array $info ) {
+		/** @var DBConnRef $dbw */
 		$dbw = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$dbw->tableExists( 'mws_category_index', __METHOD__ ) ) {
 			return;

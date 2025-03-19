@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs;
 
 use MediaWiki\User\User;
+use Wikimedia\Rdbms\DBConnRef;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class UserIndexUpdater {
@@ -25,6 +26,7 @@ class UserIndexUpdater {
 	 * @return bool
 	 */
 	public function store( User $user ) {
+		/** @var DBConnRef $db */
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$db->tableExists( 'mws_user_index', __METHOD__ ) ) {
 			return false;
@@ -49,6 +51,7 @@ class UserIndexUpdater {
 	 * @return bool
 	 */
 	public function delete( User $user ) {
+		/** @var DBConnRef $db */
 		$db = $this->lb->getConnection( DB_PRIMARY );
 		if ( !$db->tableExists( 'mws_user_index', __METHOD__ ) ) {
 			return false;
