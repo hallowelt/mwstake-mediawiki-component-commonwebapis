@@ -17,4 +17,5 @@ class TitleRecord extends Record {
 	public const PAGE_URL = 'url';
 	public const IS_CONTENT_PAGE = 'is_content_page';
 	public const PAGE_IS_REDIRECT = 'redirect';
+	public const PAGE_WIKI_ID = 'wiki_id';
 }

@@ -6,6 +6,7 @@ use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
+use MediaWiki\WikiMap\WikiMap;
 use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\Record;
 
@@ -44,11 +45,14 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 
 	/**
 	 * @param Record $dataSet
-	 * @param Title $title
+	 * @param Title|null $title
 	 *
 	 * @return void
 	 */
-	protected function extendWithTitle( Record $dataSet, Title $title ) {
+	protected function extendWithTitle( Record $dataSet, ?Title $title ) {
+		if ( !$title ) {
+			return;
+		}
 		$dataSet->set( TitleRecord::PAGE_TITLE, $title->getText() );
 		$dataSet->set( TitleRecord::PAGE_PREFIXED, $title->getPrefixedText() );
 		$dataSet->set( TitleRecord::PAGE_URL, $title->getLocalURL() );
@@ -65,9 +69,18 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 	 * @return Title|null
 	 */
 	protected function titleFromRecord( $record ) {
-		return $this->titleFactory->makeTitle(
-			$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_DBKEY )
-		);
+		if ( strtolower( WikiMap::getCurrentWikiId() ) === $record->get( TitleRecord::PAGE_WIKI_ID ) ) {
+			$title = $this->titleFactory->makeTitle(
+				$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_DBKEY )
+			);
+		} elseif ( $record->get( TitleRecord::PAGE_NAMESPACE ) < 3000 ) {
+			$title = $this->titleFactory->makeTitle(
+				$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_DBKEY )
+			);
+		} else {
+			return null;
+		}
+		return $title;
 	}
 
 	/**

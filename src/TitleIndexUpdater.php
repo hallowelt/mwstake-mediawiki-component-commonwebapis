@@ -13,7 +13,8 @@ use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
-use Wikimedia\Rdbms\DBConnRef;
+use MediaWiki\Title\Title;
+use MediaWiki\WikiMap\WikiMap;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleIndexUpdater implements
@@ -99,10 +100,9 @@ class TitleIndexUpdater implements
 	 *
 	 * @return bool
 	 */
-	private function insert( PageIdentity $page, $forceId = null ) {
-		/** @var DBConnRef $db */
+	private function insert( Title $page, $forceId = null ) {
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
+		if ( !$db->tableExists( 'mws_title_index_full', __METHOD__ ) ) {
 			return false;
 		}
 		if ( !$page->exists() ) {
@@ -110,20 +110,26 @@ class TitleIndexUpdater implements
 		}
 		// Cheaper to delete and insert, then to check if it exists
 		$db->delete(
-			'mws_title_index',
+			'mws_title_index_full',
 			[
-				'mti_page_id' => $forceId ?? $page->getId()
+				'mti_page_id' => $forceId ?? $page->getId(),
+				'mti_wiki_id' => strtolower( WikiMap::getCurrentWikiId() ),
 			],
 			__METHOD__
 		);
 
 		return $db->insert(
-			'mws_title_index',
+			'mws_title_index_full',
 			[
 				'mti_page_id' => $forceId ?? $page->getId(),
 				'mti_namespace' => $page->getNamespace(),
 				'mti_title' => mb_strtolower( str_replace( '_', ' ', $page->getDBkey() ) ),
 				'mti_displaytitle' => $this->getDisplayTitle( $page ),
+				'mti_dbkey' =>$page->getDBkey(),
+				'mti_content_model' => $page->getContentModel() ?: '',
+				'mti_wiki_id' => strtolower( WikiMap::getCurrentWikiId() ),
+				'mti_prefixed' => $page->getPrefixedText(),
+				'mti_namespace_text' => $page->getNsText()
 			],
 			__METHOD__,
 			[ 'OVERWRITE' ]
@@ -137,16 +143,17 @@ class TitleIndexUpdater implements
 	 * @return bool
 	 */
 	private function delete( int $namespace, string $title ) {
-		/** @var DBConnRef $db */
 		$db = $this->lb->getConnection( DB_PRIMARY );
-		if ( !$db->tableExists( 'mws_title_index', __METHOD__ ) ) {
+		$db = $this->lb->getConnection( DB_PRIMARY );
+		if ( !$db->tableExists( 'mws_title_index_full', __METHOD__ ) ) {
 			return false;
 		}
 		return $db->delete(
-			'mws_title_index',
+			'mws_title_index_full',
 			[
 				'mti_namespace' => $namespace,
 				'mti_title' => mb_strtolower( str_replace( '_', ' ', $title ) ),
+				'wiki_id' => strtolower( WikiMap::getCurrentWikiId() ),
 			],
 			__METHOD__
 		);

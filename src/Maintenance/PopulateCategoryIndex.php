@@ -15,7 +15,7 @@ class PopulateCategoryIndex extends LoggedUpdateMaintenance {
 	public function doDBUpdates() {
 		$db = $this->getDB( DB_PRIMARY );
 		$db->delete( 'mws_category_index', '*', __METHOD__ );
-
+		
 		$links = $db->select(
 			'category',
 			[ 'cat_id', 'cat_title', 'cat_pages' ],

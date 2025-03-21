@@ -6,7 +6,7 @@ if ( defined( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION' ) ) {
 	return;
 }
 
-define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '3.0.10' );
+define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '4.0.0' );
 
 MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 	->register( 'commonwebapis', static function () {
@@ -33,14 +33,12 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 					__DIR__ . "/sql/$dbType/mws_user_index.sql"
 				);
 
+				if ( $updater->tableExists( 'mws_title_index' ) ) {
+					$updater->dropExtensionTable( 'mws_title_index' );
+				}
 				$updater->addExtensionTable(
-					'mws_title_index',
-					__DIR__ . "/sql/$dbType/mws_title_index.sql"
-				);
-				$updater->addExtensionField(
-					'mws_title_index',
-					'mti_displaytitle',
-					__DIR__ . "/sql/$dbType/mws_title_index_displaytitle_patch.sql"
+					'mws_title_index_full',
+					__DIR__ . "/sql/$dbType/mws_title_index_full.sql"
 				);
 
 				$updater->addExtensionTable(

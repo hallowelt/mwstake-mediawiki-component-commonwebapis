@@ -71,6 +71,11 @@ class TitleSchema extends Schema {
 				self::FILTERABLE => true,
 				self::SORTABLE => true ,
 				self::TYPE => FieldType::BOOLEAN
+			],
+			TitleRecord::PAGE_WIKI_ID => [
+				self::FILTERABLE => true,
+				self::SORTABLE => true ,
+				self::TYPE => FieldType::STRING
 			]
 		], $fields ) );
 	}

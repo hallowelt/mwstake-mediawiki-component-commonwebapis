@@ -54,7 +54,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				}
 			}
 
-			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
+ 			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
 						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
@@ -82,7 +82,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 					] );
 				}
 				$filter->setApplied( true );
-				$conds[] = 'page_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
+				$conds[] = 'mti_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
 			}
 		}
 
@@ -127,7 +127,10 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @inheritDoc
 	 */
 	protected function getFields() {
-		return [ 'mti_page_id', 'mti_title', 'page_namespace', 'page_title', 'page_content_model', 'page_lang' ];
+		return [
+			'mti_page_id', 'mti_title', 'mti_wiki_id', 'mti_prefixed', 'mti_displaytitle', 'mti_namespace_text',
+			'mti_namespace', 'mti_dbkey', 'mti_content_model'
+		];
 	}
 
 	/**
@@ -148,29 +151,21 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	protected function appendRowToData( \stdClass $row ) {
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
-			TitleRecord::PAGE_NAMESPACE => (int)$row->page_namespace,
-			TitleRecord::PAGE_DBKEY => $row->page_title,
-			TitleRecord::PAGE_CONTENT_MODEL => $row->page_content_model,
-			TitleRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
+			TitleRecord::PAGE_NAMESPACE => (int)$row->mti_namespace,
+			TitleRecord::PAGE_PREFIXED => $row->mti_prefixed,
+			TitleRecord::PAGE_DBKEY => $row->mti_dbkey,
+			TitleRecord::PAGE_CONTENT_MODEL => $row->mti_content_model,
+			TitleRecord::IS_CONTENT_PAGE => in_array( $row->mti_namespace, $this->contentNamespaces ),
 			TitleRecord::PAGE_EXISTS => true,
+			TitleRecord::PAGE_WIKI_ID => $row->mti_wiki_id,
+			TitleRecord::PAGE_NAMESPACE_TEXT => $row->mti_namespace_text,
 		] );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function getJoinConds( ReaderParams $params ) {
-		return [
-			'page' => [
-				'INNER JOIN', [ 'mti_page_id = page_id' ]
-			]
-		];
 	}
 
 	/**
 	 * @return string[]
 	 */
 	protected function getTableNames() {
-		return [ 'mws_title_index', 'page' ];
+		return [ 'mws_title_index_full' ];
 	}
 }

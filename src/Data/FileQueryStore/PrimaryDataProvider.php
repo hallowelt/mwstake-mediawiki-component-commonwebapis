@@ -10,7 +10,6 @@ use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 
 class PrimaryDataProvider extends TitlePrimaryDataProvider {
 
-	/** @var array */
 	private $dbFieldMapping = [
 		'timestamp' => 'img_timestamp',
 		'title' => 'mti_title',
@@ -169,7 +168,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 			FileRecord::FILE_AUTHOR_ID => $row->img_actor,
 			FileRecord::FILE_AUTHOR_NAME => $row->actor_name ?? '',
 			FileRecord::FILE_COMMENT => $row->comment_text,
-			FileRecord::FILE_CATEGORIES => $row->categories
+			FileRecord::FILE_CATEGORIES =>  $row->categories
 		] );
 	}
 
