@@ -46,7 +46,7 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 		$dataSets = parent::extend( $dataSets );
 		foreach ( $dataSets as $dataSet ) {
 			$title = $this->titleFromRecord( $dataSet );
-			$dataSet->set( TitleRecord::PAGE_PREFIXED, $title->getText() );
+			$dataSet->set( TitleRecord::PAGE_PREFIXED, $title->getPrefixedText() );
 			$file = $this->repoGroup->getLocalRepo()->newFile( $title );
 
 			$dataSet->set(
