@@ -42,6 +42,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		if ( $params->getExpandPaths() ) {
 			$this->expandPaths = $params->getExpandPaths();
 		}
+
 		if ( $params->getNode() !== '' ) {
 			$node = $params->getNode();
 			$node = $this->splitNode( $node );
@@ -329,7 +330,25 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	 * @return array|TitleTreeRecord[]
 	 */
 	private function dataFromNode( array $node ): array {
-			return $this->getChildren( (object)$node, null );
+		$nodes = $this->getChildren( (object)$node, null );
+		return $this->expandChildrenNodes( $nodes );
+	}
+
+	private function expandChildrenNodes( $nodes ) {
+		if ( $this->expandPaths ) {
+			foreach ( $nodes as $node ) {
+				foreach ( $this->expandPaths as $path ) {
+					$pathParts = $this->splitNode( $path );
+					if ( $node->get( TitleTreeRecord::PAGE_TITLE ) === $pathParts['page_title'] &&
+						$node->get( TitleTreeRecord::PAGE_NAMESPACE ) === $pathParts['page_namespace'] ) {
+							$children = $this->expandChildrenNodes( $this->getChildren( (object)$pathParts, null ) );
+							$node->set( TitleTreeRecord::CHILDREN, $children );
+							$node->set( TitleTreeRecord::EXPANDED, true );
+					}
+				}
+			}
+		}
+		return $nodes;
 	}
 
 	/**
