@@ -35,10 +35,14 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				}
 				$nsConds = [];
 				foreach ( $filterValue as $value ) {
-					// Special case for NSFR:
-					// Filtering by namespace is a bit tricky, as NSFR stores namespaces as part of title
-					$value = mb_strtolower( str_replace( '_', ' ', $value ) );
-					$nsConds[] = 'mti_title LIKE "' . $value . ':%"';
+					if ( $value === '(Main)' ) {
+						$nsConds[] = 'mti_title NOT LIKE "%:%"';
+					} else {
+						// Special case for NSFR:
+						// Filtering by namespace is a bit tricky, as NSFR stores namespaces as part of title
+						$value = mb_strtolower( str_replace( '_', ' ', $value ) );
+						$nsConds[] = 'mti_title LIKE "' . $value . ':%"';
+					}
 				}
 				$conds[] = implode( ' OR ', $nsConds );
 				$filter->setApplied( true );
