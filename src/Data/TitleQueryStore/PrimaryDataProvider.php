@@ -89,7 +89,14 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		if ( $query !== '' ) {
 			$queryParts = explode( ':', $query, 2 );
 			$nsText = $queryParts[0] ?? '';
-			$queryText = $queryParts[1] ?? $queryParts[0];
+			$queryText = $query;
+			$nsIndex = $this->language->getLocalNsIndex( $nsText );
+			if ( $nsIndex >= 0 ) {
+				if ( empty( $nsFilter ) || in_array( $nsIndex, $nsFilter ) ) {
+					$nsFilter = [ $nsIndex ];
+					$queryText = $queryParts[1] ?? $queryParts[0];
+				}
+			}
 			$queryText = mb_strtolower( str_replace( '_', ' ', $queryText ) );
 			$titleQuery = 'mti_title ' . $this->db->buildLike(
 				$this->db->anyString(), $queryText, $this->db->anyString()
@@ -98,16 +105,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				$this->db->anyString(), $queryText, $this->db->anyString()
 			);
 			$conds[] = "($titleQuery OR $displayTitleQuery)";
-
-			if ( !empty( $nsText ) ) {
-				$nsIndex = $this->language->getLocalNsIndex( $nsText );
-				$filter = new Filter\NumericValue( [
-						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
-						Filter::KEY_VALUE => [ $nsIndex ],
-						Filter::KEY_COMPARISON => Filter::COMPARISON_EQUALS
-					] );
-				$nsFilter = array_merge( $nsFilter, $filter->getValue() );
-			}
 		}
 
 		if ( !empty( $nsFilter ) ) {
