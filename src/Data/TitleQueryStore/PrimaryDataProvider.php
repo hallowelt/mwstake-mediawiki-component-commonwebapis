@@ -18,6 +18,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var array */
 	protected $contentNamespaces;
 
+	/** @var NamespaceInfo */
+	protected $nsInfo;
+
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
@@ -29,6 +32,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
+		$this->nsInfo = $nsInfo;
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 
