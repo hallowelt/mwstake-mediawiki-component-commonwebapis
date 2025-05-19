@@ -98,6 +98,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$filters = $params->getFilter();
 		$conds = parent::makePreFilterConds( $params );
 		$query = $params->getQuery();
+		$hasGroupConditions = false;
 		foreach ( $filters as $filter ) {
 			if ( $filter->getField() === 'user_name' || $filter->getField() == 'user_real_name' ) {
 				// Incompatible with query, takes priority
@@ -112,6 +113,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 					$conds[] = $cond;
 				}
 				$filter->setApplied( true );
+				$hasGroupConditions = true;
 			}
 		}
 		if ( $query !== '' ) {
@@ -135,7 +137,20 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
 		$groupBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeGroups' );
 		if ( is_array( $groupBlacklist ) && count( $groupBlacklist ) > 0 ) {
-			$conds[] = 'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')';
+			if ( $hasGroupConditions ) {
+				// Positive list already set, we dont need to return users with no groups
+				$conds[] = 'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')';
+			} else {
+				$conds[] = '(' .
+					$this->db->makeList(
+						[
+							'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')',
+							'ug_group IS NULL'
+						],
+						LIST_OR
+					) . ')';
+			}
+
 		}
 		$userBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeUsers' );
 		if ( is_array( $userBlacklist ) && count( $userBlacklist ) > 0 ) {
