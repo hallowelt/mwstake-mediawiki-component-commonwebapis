@@ -334,6 +334,10 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		return $this->expandChildrenNodes( $nodes );
 	}
 
+	/**
+	 * @param TitleTreeRecord[] $nodes
+	 * @return array|TitleTreeRecord[]
+	 */
 	private function expandChildrenNodes( $nodes ) {
 		if ( $this->expandPaths ) {
 			foreach ( $nodes as $node ) {
