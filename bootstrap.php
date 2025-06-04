@@ -24,7 +24,7 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 
 			$hookContainer->register( 'LoadExtensionSchemaUpdates', static function ( $updater ) {
 				if ( !$updater instanceof DatabaseUpdater ) {
-					throw new \MWException( "LoadExtensionSchemaUpdates hook must be called with a DatabaseUpdater" );
+					throw new LogicException( "LoadExtensionSchemaUpdates hook must be called with a DatabaseUpdater" );
 				}
 
 				$dbType = $updater->getDB()->getType();
