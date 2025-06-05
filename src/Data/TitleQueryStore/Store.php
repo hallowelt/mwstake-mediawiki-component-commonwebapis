@@ -4,6 +4,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
+use MediaWiki\MediaWikiServices;
 
 class Store implements IStore {
 	/** @var ILoadBalancer */
@@ -22,16 +23,22 @@ class Store implements IStore {
 	 * @param \TitleFactory $titleFactory
 	 * @param \Language $language
 	 * @param \NamespaceInfo $nsInfo
-	 * @param \PageProps $pageProps
+	 * @param \PageProps|null $pageProps
 	 */
 	public function __construct(
 		ILoadBalancer $lb, \TitleFactory $titleFactory, \Language $language,
-		\NamespaceInfo $nsInfo, \PageProps $pageProps
+		\NamespaceInfo $nsInfo, \PageProps $pageProps = null
 	) {
 		$this->lb = $lb;
 		$this->titleFactory = $titleFactory;
 		$this->language = $language;
 		$this->nsInfo = $nsInfo;
+
+		// Unintentionally, interface has changed in 2.0.9, so we need to check for the PageProps
+		if ( !$pageProps ) {
+			$pageProps = MediaWikiServices::getInstance()->getPageProps();
+		}
+
 		$this->pageProps = $pageProps;
 	}
 
