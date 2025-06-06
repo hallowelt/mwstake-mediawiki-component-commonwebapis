@@ -91,24 +91,22 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		}
 
 		if ( $query !== '' ) {
-			$queryParts = explode( ':', $query, 2 );
-			$nsText = $queryParts[0] ?? '';
-			$queryText = $query;
-			$nsIndex = $this->language->getLocalNsIndex( $nsText );
-			if ( $nsIndex >= 0 ) {
-				if ( empty( $nsFilter ) || in_array( $nsIndex, $nsFilter ) ) {
-					$nsFilter = [ $nsIndex ];
-					$queryText = $queryParts[1] ?? $queryParts[0];
+			$colonPos = mb_strpos( $query, ':' );
+			if ( $colonPos !== false ) {
+				$queryParts = explode( ':', $query, 2 );
+				$nsText = $queryParts[0] ?? '';
+				$queryText = $query;
+				$nsIndex = $this->language->getLocalNsIndex( $nsText );
+				if ( $nsIndex !== false ) {
+					if ( empty( $nsFilter ) || in_array( $nsIndex, $nsFilter ) ) {
+						$nsFilter = [ $nsIndex ];
+						$queryText = $queryParts[1] ?? $queryParts[0];
+					}
 				}
+				$conds[] = $this->processQuery( $queryText );
+			} else {
+				$conds[] = $this->processQuery( $query );
 			}
-			$queryText = mb_strtolower( str_replace( '_', ' ', $queryText ) );
-			$titleQuery = 'mti_title ' . $this->db->buildLike(
-				$this->db->anyString(), $queryText, $this->db->anyString()
-			);
-			$displayTitleQuery = 'mti_displaytitle ' . $this->db->buildLike(
-				$this->db->anyString(), $queryText, $this->db->anyString()
-			);
-			$conds[] = "($titleQuery OR $displayTitleQuery)";
 		}
 
 		if ( !empty( $nsFilter ) ) {
@@ -116,6 +114,21 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		}
 
 		return $conds;
+	}
+
+	/**
+	 * @param string $query
+	 * @return string
+	 */
+	protected function processQuery( string $query ) {
+		$query = mb_strtolower( str_replace( '_', ' ', $query ) );
+		$titleQuery = 'mti_title ' . $this->db->buildLike(
+			$this->db->anyString(), $query, $this->db->anyString()
+		);
+		$displayTitleQuery = 'mti_displaytitle ' . $this->db->buildLike(
+			$this->db->anyString(), $query, $this->db->anyString()
+		);
+		return "($titleQuery OR $displayTitleQuery)";
 	}
 
 	/**
