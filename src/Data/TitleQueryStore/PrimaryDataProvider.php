@@ -93,7 +93,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				$nsText = $queryParts[0] ?? '';
 				$queryText = $query;
 				$nsIndex = $this->language->getLocalNsIndex( $nsText );
-				if ( $nsIndex >= 0 ) {
+				if ( $nsIndex !== false ) {
 					if ( empty( $nsFilter ) || in_array( $nsIndex, $nsFilter ) ) {
 						$nsFilter = [ $nsIndex ];
 						$queryText = $queryParts[1] ?? $queryParts[0];
