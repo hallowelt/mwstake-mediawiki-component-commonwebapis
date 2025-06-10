@@ -17,9 +17,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var array|null */
 	private $expandPaths = null;
 
-	/** @var NamespaceInfo */
-	private $nsInfo;
-
 	/** @var PermissionManager */
 	private $permissionManager;
 
@@ -29,7 +26,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	public function __construct( IDatabase $db, Schema $schema, Language $language,
 		NamespaceInfo $nsInfo, PermissionManager $permissionManager ) {
 		parent::__construct( $db, $schema, $language, $nsInfo );
-		$this->nsInfo = $nsInfo;
 		$this->permissionManager = $permissionManager;
 	}
 
