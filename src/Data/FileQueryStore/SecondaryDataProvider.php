@@ -26,7 +26,7 @@ class SecondaryDataProvider extends TitleSecondaryDataProvider {
 	/**
 	 * @param TitleFactory $titleFactory
 	 * @param Language $language
-	 * @param PageProps $pageProps
+	 * @param PageProps $pageProp
 	 * @param \RepoGroup $repoGroup
 	 */
 	public function __construct( $titleFactory, Language $language, PageProps $pageProps, \RepoGroup $repoGroup ) {

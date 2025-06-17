@@ -2,11 +2,8 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
-use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
-use MediaWiki\Title\Title;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\DataStore\Schema;
 use Wikimedia\Rdbms\IDatabase;
@@ -17,14 +14,16 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var array|null */
 	private $expandPaths = null;
 
-	/** @var PermissionManager */
+  /** @var PermissionManager */
 	private $permissionManager;
 
 	/**
 	 * @inheritDoc
 	 */
-	public function __construct( IDatabase $db, Schema $schema, Language $language,
-		NamespaceInfo $nsInfo, PermissionManager $permissionManager ) {
+	public function __construct(
+		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo,
+		PermissionManager $permissionManager
+	) {
 		parent::__construct( $db, $schema, $language, $nsInfo );
 		$this->permissionManager = $permissionManager;
 	}
@@ -70,12 +69,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	protected function appendRowToData( \stdClass $row ) {
 		$indexTitle = $row->mti_title;
 		$uniqueId = $this->getUniqueId( $row );
-
-		$user = RequestContext::getMain()->getUser();
-		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
-			return;
-		}
-
 		if ( $this->isSubpage( $indexTitle ) &&
 			$this->nsInfo->hasSubpages( (int)$row->page_namespace ) ) {
 			if (
@@ -404,7 +397,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				'page_namespace' => $row->page_namespace,
 				'page_title' => $title
 			],
-			__METHOD__
 		);
 	}
 
@@ -449,7 +441,6 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				'page_namespace' => $namespace,
 				'page_title' => $matches[0]
 			],
-			__METHOD__
 		);
 
 		if ( !$exists ) {
