@@ -125,7 +125,7 @@ class TitleIndexUpdater implements
 				'mti_namespace' => $page->getNamespace(),
 				'mti_title' => mb_strtolower( str_replace( '_', ' ', $page->getDBkey() ) ),
 				'mti_displaytitle' => $this->getDisplayTitle( $page ),
-				'mti_dbkey' =>$page->getDBkey(),
+				'mti_dbkey' => $page->getDBkey(),
 				'mti_content_model' => $page->getContentModel() ?: '',
 				'mti_wiki_id' => strtolower( WikiMap::getCurrentWikiId() ),
 				'mti_prefixed' => $page->getPrefixedText(),

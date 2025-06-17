@@ -3,7 +3,6 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
 use MediaWiki\Maintenance\LoggedUpdateMaintenance;
-use MediaWiki\MediaWikiServices;
 use MediaWiki\WikiMap\WikiMap;
 
 $maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';

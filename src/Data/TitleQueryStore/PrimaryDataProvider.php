@@ -58,7 +58,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				}
 			}
 
- 			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
+			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
 						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,

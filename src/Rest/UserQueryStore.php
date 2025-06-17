@@ -32,7 +32,7 @@ class UserQueryStore extends QueryStore {
 		parent::__construct( $hookContainer );
 		$this->store = new Store( $lb, $userFactory, $linkRenderer, $titleFactory, $mwsgConfig );
 	}
-	
+
 	/**
 	 * @param ResultSet $result
 	 *
@@ -56,7 +56,7 @@ class UserQueryStore extends QueryStore {
 	protected function getStore(): IStore {
 		return $this->store;
 	}
-	
+
 	/**
 	 * @return array
 	 */
@@ -65,7 +65,7 @@ class UserQueryStore extends QueryStore {
 			->getReader()
 			->makePrimaryDataProvider( $this->getReaderParams() )
 			->getGroupBuckets();
-		
+
 		return [
 			'groups' => $groups
 		];

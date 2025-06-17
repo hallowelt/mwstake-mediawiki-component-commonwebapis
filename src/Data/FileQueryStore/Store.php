@@ -23,7 +23,6 @@ class Store implements IStore {
 	/** @var \RepoGroup */
 	protected $repoGroup;
 
-
 	/**
 	 * @param ILoadBalancer $lb
 	 * @param TitleFactory $titleFactory
