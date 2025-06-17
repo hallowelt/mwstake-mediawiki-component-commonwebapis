@@ -14,7 +14,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var array|null */
 	private $expandPaths = null;
 
-  /** @var PermissionManager */
+	/** @var PermissionManager */
 	private $permissionManager;
 
 	/**
