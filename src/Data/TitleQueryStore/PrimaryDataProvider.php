@@ -18,6 +18,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var array */
 	protected $contentNamespaces;
 
+	/** @var NamespaceInfo */
+	protected $nsInfo;
+
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
@@ -29,6 +32,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
+		$this->nsInfo = $nsInfo;
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 
@@ -87,14 +91,22 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		}
 
 		if ( $query !== '' ) {
-			$query = mb_strtolower( str_replace( '_', ' ', $query ) );
-			$titleQuery = 'mti_title ' . $this->db->buildLike(
-				$this->db->anyString(), $query, $this->db->anyString()
-			);
-			$displayTitleQuery = 'mti_displaytitle ' . $this->db->buildLike(
-				$this->db->anyString(), $query, $this->db->anyString()
-			);
-			$conds[] = "($titleQuery OR $displayTitleQuery)";
+			$colonPos = mb_strpos( $query, ':' );
+			if ( $colonPos !== false ) {
+				$queryParts = explode( ':', $query, 2 );
+				$nsText = $queryParts[0] ?? '';
+				$queryText = $query;
+				$nsIndex = $this->language->getLocalNsIndex( $nsText );
+				if ( $nsIndex !== false ) {
+					if ( empty( $nsFilter ) || in_array( $nsIndex, $nsFilter ) ) {
+						$nsFilter = [ $nsIndex ];
+						$queryText = $queryParts[1] ?? $queryParts[0];
+					}
+				}
+				$conds[] = $this->processQuery( $queryText );
+			} else {
+				$conds[] = $this->processQuery( $query );
+			}
 		}
 
 		if ( !empty( $nsFilter ) ) {
@@ -102,6 +114,21 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		}
 
 		return $conds;
+	}
+
+	/**
+	 * @param string $query
+	 * @return string
+	 */
+	protected function processQuery( string $query ) {
+		$query = mb_strtolower( str_replace( '_', ' ', $query ) );
+		$titleQuery = 'mti_title ' . $this->db->buildLike(
+			$this->db->anyString(), $query, $this->db->anyString()
+		);
+		$displayTitleQuery = 'mti_displaytitle ' . $this->db->buildLike(
+			$this->db->anyString(), $query, $this->db->anyString()
+		);
+		return "($titleQuery OR $displayTitleQuery)";
 	}
 
 	/**

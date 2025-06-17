@@ -12,7 +12,7 @@ use Wikimedia\Rdbms\IDatabase;
 
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var array */
-	private $groups = [];
+	private $groupLabels = [];
 	/** @var array */
 	private $blocks = [];
 
@@ -39,10 +39,11 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
 	/**
 	 * Get supporting data for the user records
+	 *
+	 * @param ReaderParams $params
 	 * @return void
 	 */
-	private function getSupportingData() {
-		$this->groups = $this->getGroups();
+	private function getSupportingData( ReaderParams $params ) {
 		$this->blocks = $this->getBlocks();
 	}
 
@@ -62,30 +63,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		);
 		$groups = [];
 		foreach ( $res as $row ) {
-			$msg = Message::newFromKey( 'group-' . $row->ug_group );
-			$groups[$row->ug_group] = $msg->exists() ? $msg->text() : $row->ug_group;
+			$groups[$row->ug_group] = $this->tryGetGroupLabel( $row->ug_group );
 		}
 
-		return $groups;
-	}
-
-	/**
-	 * @return array
-	 */
-	private function getGroups() {
-		$groupBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeGroups' );
-		$res = $this->db->select(
-			'user_groups',
-			[ 'ug_user', 'ug_group' ],
-			[
-				'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')',
-			],
-			__METHOD__
-		);
-		$groups = [];
-		foreach ( $res as $row ) {
-			$groups[$row->ug_user][] = $row->ug_group;
-		}
 		return $groups;
 	}
 
@@ -118,12 +98,22 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$filters = $params->getFilter();
 		$conds = parent::makePreFilterConds( $params );
 		$query = $params->getQuery();
+		$hasGroupConditions = false;
 		foreach ( $filters as $filter ) {
 			if ( $filter->getField() === 'user_name' || $filter->getField() == 'user_real_name' ) {
 				// Incompatible with query, takes priority
 				$query = '';
 				$this->addIndexedNameFilter( $filter, $conds );
 				$filter->setApplied( true );
+			}
+			if ( $filter->getField() === 'groups' ) {
+				$filterValue = $filter->getValue();
+				$cond = $this->getGroupCondition( $filterValue );
+				if ( $cond ) {
+					$conds[] = $cond;
+				}
+				$filter->setApplied( true );
+				$hasGroupConditions = true;
 			}
 		}
 		if ( $query !== '' ) {
@@ -145,6 +135,23 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			$this->db->anyString(), 'INVALID', $this->db->anyString()
 		);
 
+		$groupBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeGroups' );
+		if ( is_array( $groupBlacklist ) && count( $groupBlacklist ) > 0 ) {
+			if ( $hasGroupConditions ) {
+				// Positive list already set, we dont need to return users with no groups
+				$conds[] = 'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')';
+			} else {
+				$conds[] = '(' .
+					$this->db->makeList(
+						[
+							'ug_group NOT IN (' . $this->db->makeList( $groupBlacklist ) . ')',
+							'ug_group IS NULL'
+						],
+						LIST_OR
+					) . ')';
+			}
+
+		}
 		$userBlacklist = $this->mwsgConfig->get( 'CommonWebAPIsComponentUserStoreExcludeUsers' );
 		if ( is_array( $userBlacklist ) && count( $userBlacklist ) > 0 ) {
 			$conds[] = 'user_name NOT IN (' . $this->db->makeList( $userBlacklist ) . ')';
@@ -198,6 +205,16 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	}
 
 	/**
+	 * @return string[]
+	 */
+	protected function getFields() {
+		return [
+			'user_id', 'user_name', 'user_real_name', 'user_registration', 'user_editcount', 'user_email',
+			'GROUP_CONCAT( ug_group SEPARATOR \'|\' ) AS \'groups\'',
+		];
+	}
+
+	/**
 	 * @param \stdClass $row
 	 *
 	 * @return void
@@ -210,8 +227,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			'user_registration' => $row->user_registration,
 			'user_editcount' => (int)$row->user_editcount,
 			'user_email' => $row->user_email,
-			'groups' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
-			'groups_raw' => isset( $this->groups[$row->user_id] ) ? $this->groups[$row->user_id] : [],
+			'groups' => $this->setGroupLabels( explode( '|', $row->groups ) ),
+			'groups_raw' => explode( '|', $row->groups ),
 			'enabled' => !$this->isUserBlocked( (int)$row->user_id ),
 			// legacy fields
 			'display_name' => $row->user_real_name == null ? $row->user_name : $row->user_real_name,
@@ -226,6 +243,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		return [
 			'mws_user_index' => [
 				'INNER JOIN', [ 'user_id = mui_user_id' ]
+			],
+			'user_groups' => [
+				'LEFT OUTER JOIN', [ 'ug_user = user_id' ],
 			]
 		];
 	}
@@ -234,6 +254,66 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @return string[]
 	 */
 	protected function getTableNames() {
-		return [ 'user', 'mws_user_index' ];
+		return [ 'user', 'mws_user_index', 'user_groups' ];
+	}
+
+	/**
+	 * @param mixed $filterValue
+	 * @return string|void
+	 */
+	private function getGroupCondition( $filterValue ) {
+		if ( is_array( $filterValue ) && count( $filterValue ) > 0 ) {
+			$groupConds = [];
+			foreach ( $filterValue as &$value ) {
+				$groupConds[] = 'ug_group = ' . $this->db->addQuotes( $value );
+			}
+			return $this->db->makeList(
+				$groupConds,
+				LIST_OR
+			);
+		} elseif ( is_string( $filterValue ) && $filterValue !== '' ) {
+			return 'ug_group = ' . $this->db->addQuotes( $filterValue );
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param ReaderParams $params
+	 * @return array
+	 */
+	protected function makePreOptionConds( ReaderParams $params ) {
+		$options = parent::makePreOptionConds( $params );
+		$options['GROUP BY'] = 'user_id';
+		return $options;
+	}
+
+	/**
+	 * @param array $groups
+	 * @return string[]
+	 */
+	private function setGroupLabels( array $groups ): array {
+		return array_filter( array_map(
+			function ( $group ) {
+				if ( empty( $group ) ) {
+					return null;
+				}
+				return $this->tryGetGroupLabel( $group );
+			},
+			$groups
+		) );
+	}
+
+	/**
+	 * @param string $group
+	 * @return string
+	 */
+	private function tryGetGroupLabel( string $group ): string {
+		if ( !isset( $this->groupLabels[$group] ) ) {
+			$msg = Message::newFromKey( 'group-' . $group );
+			$this->groupLabels[$group] = $msg->exists() ? $msg->text() : $group;
+		}
+
+		return $this->groupLabels[$group];
 	}
 }
