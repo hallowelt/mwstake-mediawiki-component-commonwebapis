@@ -6,8 +6,7 @@ use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Title\TitleFactory;
-use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\SecondaryDataProvider
-	as TitleSecondaryDataProvider;
+use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\SecondaryDataProvider as TitleSecondaryDataProvider;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\TitleRecord;
 
 class SecondaryDataProvider extends TitleSecondaryDataProvider {
