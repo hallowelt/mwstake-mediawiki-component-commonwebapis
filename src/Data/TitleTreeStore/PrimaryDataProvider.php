@@ -270,12 +270,14 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 					);
 					$this->nodeCache[ $uniqueChildId ] = $childRow->children;
 				}
+			} else {
+				if ( ( substr_count( $row->page_title, '/' ) + 1 ) !== substr_count( $childRow->page_title, '/' ) ) {
+					continue;
+				}
 			}
-	
 			$child = $this->makeRecord( $childRow, $uniqueChildId, false, false );
 			$children[] = $child;
 		}
-
 		return $children;
 	}
 
@@ -299,7 +301,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		$pages = [];
 		foreach( $this->subpageData as $subpageRow ) {
 			if ( str_starts_with( $subpageRow->page_title, $row->page_title . '/' ) ) {
-				$subpage = substr( $subpageRow->page_title, strlen( $row->page_title . '/' ));
+				$subpage = substr( $subpageRow->page_title, strlen( $row->page_title . '/' ) );
 				if ( str_contains( $subpage, '/' ) ) {
 					continue;
 				}
@@ -313,7 +315,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 		if ( empty( $this->subpageData ) ) {
 			$res = $this->db->select(
 				[ 'page' ],
-				[ 'page_title', 'page_namespace' ],
+				[ 'page_title', 'page_namespace', 'page_content_model' ],
 				[
 					'page_namespace' => $row->page_namespace,
 					'page_title LIKE ' . $this->db->addQuotes( $row->page_title . '/%' )
@@ -323,6 +325,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			);
 
 			foreach ( $res as $subpageRow ) {
+				$this->subpageData[ $subpageRow->page_namespace . '|' . $subpageRow->page_title ] = $subpageRow;
 				$pages[] = $subpageRow;
 			}
 		}
@@ -448,7 +451,8 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			if ( $nonExistingPage ) {
 				$res[] = (object)[
 					'page_title' => $nonExistingPage,
-					'page_namespace' => $row->page_namespace
+					'page_namespace' => $row->page_namespace,
+					'page_content_model' => $row->page_content_model
 				];
 			}
 		}
