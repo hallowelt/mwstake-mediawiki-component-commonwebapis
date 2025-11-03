@@ -1,6 +1,6 @@
 <?php
 
-namespace MWStake\MediaWiki\Component\CommonWebAPIs\Tests;
+namespace MWStake\MediaWiki\Component\CommonWebAPIs\Tests\Unit;
 
 use MWStake\MediaWiki\Component\CommonWebAPIs\EndpointManager;
 use PHPUnit\Framework\TestCase;
