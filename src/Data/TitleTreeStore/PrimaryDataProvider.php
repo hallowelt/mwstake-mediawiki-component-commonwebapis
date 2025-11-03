@@ -378,13 +378,13 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			foreach ( $nodes as $node ) {
 				foreach ( $this->expandPaths as $path ) {
 					$pathParts = $this->splitNode( $path );
-					if ( $node->get( TitleTreeRecord::PAGE_TITLE ) === $pathParts['page_title'] &&
-						$node->get( TitleTreeRecord::PAGE_NAMESPACE ) === $pathParts['page_namespace'] ) {
-							$children = $this->expandChildrenNodes(
-								$this->getChildren( (object)$pathParts, null, true )
-							);
-							$node->set( TitleTreeRecord::CHILDREN, $children );
-							$node->set( TitleTreeRecord::EXPANDED, true );
+					if (
+						$node->get( TitleTreeRecord::PAGE_TITLE ) === $pathParts['page_title'] &&
+						$node->get( TitleTreeRecord::PAGE_NAMESPACE ) === $pathParts['page_namespace']
+					) {
+						$children = $this->expandChildrenNodes( $this->getChildren( (object)$pathParts, null, true ) );
+						$node->set( TitleTreeRecord::CHILDREN, $children );
+						$node->set( TitleTreeRecord::EXPANDED, true );
 					}
 				}
 			}
