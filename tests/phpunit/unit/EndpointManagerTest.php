@@ -2,10 +2,10 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Tests\Unit;
 
+use MediaWikiUnitTestCase;
 use MWStake\MediaWiki\Component\CommonWebAPIs\EndpointManager;
-use PHPUnit\Framework\TestCase;
 
-class EndpointManagerTest extends TestCase {
+class EndpointManagerTest extends MediaWikiUnitTestCase {
 
 	/**
 	 * @covers \MWStake\MediaWiki\Component\CommonWebAPIs\EndpointManager::getAvailableEndpoints
