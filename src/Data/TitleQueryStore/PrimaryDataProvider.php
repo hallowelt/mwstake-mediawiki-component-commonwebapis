@@ -146,7 +146,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
 						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
-						Filter::KEY_VALUE => [ (int)$filter->getValue() ],
+						Filter::KEY_VALUE => [ $filter->getValue() ],
 						Filter::KEY_COMPARISON => 'in'
 					] );
 				}
@@ -171,7 +171,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
 				$filter = new Filter\StringValue( [
 					Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
-					Filter::KEY_VALUE => [ $nsIndex ],
+					Filter::KEY_VALUE => [ (string)$nsIndex ],
 					Filter::KEY_COMPARISON => 'in'
 				] );
 
