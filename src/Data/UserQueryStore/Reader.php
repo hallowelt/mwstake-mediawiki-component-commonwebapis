@@ -8,6 +8,7 @@ use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
+use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
@@ -21,6 +22,8 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	protected $titleFactory;
 	/** @var Config */
 	protected $mwsgConfig;
+	/** @var UtilityFactory */
+	protected $utilityFactory;
 
 	/**
 	 * @param ILoadBalancer $lb
@@ -28,10 +31,11 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 * @param LinkRenderer $linkRenderer
 	 * @param TitleFactory $titleFactory
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param UtilityFactory $utilityFactory
 	 */
 	public function __construct(
-		ILoadBalancer $lb, UserFactory $userFactory,
-		LinkRenderer $linkRenderer, TitleFactory $titleFactory, GlobalVarConfig $mwsgConfig
+		ILoadBalancer $lb, UserFactory $userFactory, LinkRenderer $linkRenderer, TitleFactory $titleFactory,
+		GlobalVarConfig $mwsgConfig, UtilityFactory $utilityFactory
 	) {
 		parent::__construct();
 		$this->lb = $lb;
@@ -39,6 +43,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 		$this->linkRenderer = $linkRenderer;
 		$this->titleFactory = $titleFactory;
 		$this->mwsgConfig = $mwsgConfig;
+		$this->utilityFactory = $utilityFactory;
 	}
 
 	/**
@@ -55,7 +60,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 */
 	public function makePrimaryDataProvider( $params ) {
 		return new PrimaryDataProvider(
-			$this->lb->getConnection( DB_REPLICA ), $this->getSchema(), $this->mwsgConfig
+			$this->lb->getConnection( DB_REPLICA ), $this->getSchema(), $this->mwsgConfig, $this->utilityFactory
 		);
 	}
 

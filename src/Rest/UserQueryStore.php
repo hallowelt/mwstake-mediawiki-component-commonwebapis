@@ -11,6 +11,7 @@ use MediaWiki\User\UserFactory;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore\Store;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\DataStore\ResultSet;
+use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class UserQueryStore extends QueryStore {
@@ -27,10 +28,11 @@ class UserQueryStore extends QueryStore {
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, UserFactory $userFactory,
-		LinkRenderer $linkRenderer, TitleFactory $titleFactory, GlobalVarConfig $mwsgConfig
+		LinkRenderer $linkRenderer, TitleFactory $titleFactory, GlobalVarConfig $mwsgConfig,
+		UtilityFactory $utilityFactory
 	) {
 		parent::__construct( $hookContainer );
-		$this->store = new Store( $lb, $userFactory, $linkRenderer, $titleFactory, $mwsgConfig );
+		$this->store = new Store( $lb, $userFactory, $linkRenderer, $titleFactory, $mwsgConfig, $utilityFactory );
 	}
 
 	/**

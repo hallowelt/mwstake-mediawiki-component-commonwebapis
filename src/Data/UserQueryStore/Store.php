@@ -8,6 +8,7 @@ use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
 use MWStake\MediaWiki\Component\DataStore\IStore;
+use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class Store implements IStore {
@@ -21,6 +22,8 @@ class Store implements IStore {
 	protected $titleFactory;
 	/** @var Config */
 	protected $mwsgConfig;
+	/** @var UtilityFactory */
+	protected $utilityFactory;
 
 	/**
 	 * @param ILoadBalancer $lb
@@ -28,16 +31,18 @@ class Store implements IStore {
 	 * @param LinkRenderer $linkRenderer
 	 * @param TitleFactory $titleFactory
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param UtilityFactory $utilityFactory
 	 */
 	public function __construct(
-		ILoadBalancer $lb, UserFactory $userFactory,
-		LinkRenderer $linkRenderer, TitleFactory $titleFactory, GlobalVarConfig $mwsgConfig
+		ILoadBalancer $lb, UserFactory $userFactory, LinkRenderer $linkRenderer, TitleFactory $titleFactory,
+		GlobalVarConfig $mwsgConfig, UtilityFactory $utilityFactory
 	) {
 		$this->lb = $lb;
 		$this->userFactory = $userFactory;
 		$this->linkRenderer = $linkRenderer;
 		$this->titleFactory = $titleFactory;
 		$this->mwsgConfig = $mwsgConfig;
+		$this->utilityFactory = $utilityFactory;
 	}
 
 	/**
@@ -53,7 +58,7 @@ class Store implements IStore {
 	public function getReader() {
 		return new Reader(
 			$this->lb, $this->userFactory, $this->linkRenderer,
-			$this->titleFactory, $this->mwsgConfig
+			$this->titleFactory, $this->mwsgConfig, $this->utilityFactory
 		);
 	}
 

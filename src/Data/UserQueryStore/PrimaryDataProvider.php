@@ -9,6 +9,7 @@ use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\DataStore\Schema;
+use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\IDatabase;
 
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
@@ -19,15 +20,20 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
 	/** @var GlobalVarConfig */
 	protected $mwsgConfig;
+	/** @var UtilityFactory */
+	protected $utilityFactory;
 
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
 	 * @param GlobalVarConfig $mwsgConfig
 	 */
-	public function __construct( IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig ) {
+	public function __construct(
+		IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig, UtilityFactory $utilityFactory
+	) {
 		parent::__construct( $db, $schema );
 		$this->mwsgConfig = $mwsgConfig;
+		$this->utilityFactory = $utilityFactory;
 	}
 
 	/**
@@ -227,6 +233,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 */
 	protected function appendRowToData( \stdClass $row ) {
 		$realName = $row->user_real_name !== null ? Sanitizer::stripAllTags( $row->user_real_name ?? '' ) : null;
+		$groups = $this->getAllowedGroups( explode( '|', $row->groups ) );
 		$resultRow = [
 			'user_id' => (int)$row->user_id,
 			'user_name' => $row->user_name,
@@ -234,8 +241,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			'user_registration' => $row->user_registration,
 			'user_editcount' => (int)$row->user_editcount,
 			'user_email' => $row->user_email,
-			'groups' => $this->setGroupLabels( explode( '|', $row->groups ) ),
-			'groups_raw' => explode( '|', $row->groups ),
+			'groups' => $this->setGroupLabels( $groups ),
+			'groups_raw' => $groups,
+			'groups_all' => explode( '|', $row->groups ),
 			'enabled' => !$this->isUserBlocked( (int)$row->user_id ),
 			// legacy fields
 			'display_name' => !$realName ? $row->user_name : $realName,
@@ -322,5 +330,14 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		}
 
 		return $this->groupLabels[$group];
+	}
+
+	/**
+	 * @param array $groups
+	 * @return array
+	 */
+	private function getAllowedGroups( array $groups ): array {
+		$allowed = $this->utilityFactory->getGroupHelper()->getAvailableGroups();
+		return array_intersect( $groups, $allowed );
 	}
 }
