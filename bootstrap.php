@@ -1,4 +1,4 @@
-?php
+<?php
 
 use MediaWiki\Installer\DatabaseUpdater;
 
