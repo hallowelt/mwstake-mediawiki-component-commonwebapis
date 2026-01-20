@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Linker\LinkRenderer;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
@@ -25,13 +26,17 @@ class UserQueryStore extends QueryStore {
 	 * @param LinkRenderer $linkRenderer
 	 * @param TitleFactory $titleFactory
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param UtilityFactory|null $utilityFactory
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, UserFactory $userFactory,
 		LinkRenderer $linkRenderer, TitleFactory $titleFactory, GlobalVarConfig $mwsgConfig,
-		UtilityFactory $utilityFactory
+		?UtilityFactory $utilityFactory = null
 	) {
 		parent::__construct( $hookContainer );
+		if ( !$utilityFactory ) {
+			$utilityFactory = MediaWikiServices::getInstance()->getService( 'MWStakeCommonUtilsFactory' );
+		}
 		$this->store = new Store( $lb, $userFactory, $linkRenderer, $titleFactory, $mwsgConfig, $utilityFactory );
 	}
 

@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
 use MediaWiki\Config\GlobalVarConfig;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Sanitizer;
 use MWStake\MediaWiki\Component\DataStore\Filter;
@@ -27,12 +28,16 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @param IDatabase $db
 	 * @param Schema $schema
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param UtilityFactory|null $utilityFactory
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig, UtilityFactory $utilityFactory
+		IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig, ?UtilityFactory $utilityFactory = null
 	) {
 		parent::__construct( $db, $schema );
 		$this->mwsgConfig = $mwsgConfig;
+		if ( !$utilityFactory ) {
+			$utilityFactory = MediaWikiServices::getInstance()->getService( 'MWStakeCommonUtilsFactory' );
+		}
 		$this->utilityFactory = $utilityFactory;
 	}
 

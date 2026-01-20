@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 use MediaWiki\Config\Config;
 use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\Linker\LinkRenderer;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserFactory;
 use MWStake\MediaWiki\Component\DataStore\IStore;
@@ -31,17 +32,20 @@ class Store implements IStore {
 	 * @param LinkRenderer $linkRenderer
 	 * @param TitleFactory $titleFactory
 	 * @param GlobalVarConfig $mwsgConfig
-	 * @param UtilityFactory $utilityFactory
+	 * @param UtilityFactory|null $utilityFactory
 	 */
 	public function __construct(
 		ILoadBalancer $lb, UserFactory $userFactory, LinkRenderer $linkRenderer, TitleFactory $titleFactory,
-		GlobalVarConfig $mwsgConfig, UtilityFactory $utilityFactory
+		GlobalVarConfig $mwsgConfig, ?UtilityFactory $utilityFactory = null
 	) {
 		$this->lb = $lb;
 		$this->userFactory = $userFactory;
 		$this->linkRenderer = $linkRenderer;
 		$this->titleFactory = $titleFactory;
 		$this->mwsgConfig = $mwsgConfig;
+		if ( !$utilityFactory ) {
+			$utilityFactory = MediaWikiServices::getInstance()->getService( 'MWStakeCommonUtilsFactory' );
+		}
 		$this->utilityFactory = $utilityFactory;
 	}
 
