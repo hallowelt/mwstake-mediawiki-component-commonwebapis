@@ -22,7 +22,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var NamespaceInfo */
 	protected $nsInfo;
 
-
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
@@ -38,6 +37,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function makeData( $params ) {
 		$this->data = [];
 

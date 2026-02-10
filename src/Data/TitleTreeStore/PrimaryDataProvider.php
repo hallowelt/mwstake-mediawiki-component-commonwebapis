@@ -305,7 +305,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 				if ( str_contains( $subpage, '/' ) ) {
 					continue;
 				}
-				if ( (int) $subpageRow->page_namespace !== $row->page_namespace ) {
+				if ( (int)$subpageRow->page_namespace !== $row->page_namespace ) {
 					continue;
 				}
 				$pages[] = $subpageRow;
@@ -381,13 +381,11 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			foreach ( $nodes as $node ) {
 				foreach ( $this->expandPaths as $path ) {
 					$pathParts = $this->splitNode( $path );
-					var_dump(  $pathParts );
 					if (
 						$node->get( TitleTreeRecord::PAGE_TITLE ) === $pathParts['page_title'] &&
 						$node->get( TitleTreeRecord::PAGE_NAMESPACE ) === $pathParts['page_namespace']
 					) {
 						$children = $this->expandChildrenNodes( $this->getChildren( (object)$pathParts, null, true ) );
-						var_dump( $children );
 						$node->set( TitleTreeRecord::CHILDREN, $children );
 						$node->set( TitleTreeRecord::EXPANDED, true );
 					}
