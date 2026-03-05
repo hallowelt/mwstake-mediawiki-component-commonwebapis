@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore;
 
 use MediaWiki\Config\GlobalVarConfig;
+use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\DataStore\IPrimaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\Utils\Utility\GroupHelper;
@@ -19,12 +20,19 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 	protected $mwsgConfig;
 
 	/**
+	 * @var HookContainer
+	 */
+	protected $hookContainer;
+
+	/**
 	 * @param GroupHelper $groupHelper
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param HookContainer $hookContainer
 	 */
-	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig ) {
+	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer ) {
 		$this->groupHelper = $groupHelper;
 		$this->mwsgConfig = $mwsgConfig;
+		$this->hookContainer = $hookContainer;
 	}
 
 	/**
@@ -36,8 +44,10 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 		$query = strtolower( $params->getQuery() );
 
 		$data = [];
+		$typeFilter = $this->getGroupTypeFilter( $params );
+		$this->hookContainer->run( 'MWStakeGroupStoreGroupTypeFilter', [ &$typeFilter ] );
 		$explicitGroups = $this->groupHelper->getAvailableGroups( [
-			'filter' => $this->getGroupFilter( $params ),
+			'filter' => $typeFilter,
 			'blacklist' => $this->mwsgConfig->get( 'CommonWebAPIsComponentGroupStoreExcludeGroups' ),
 		] );
 		foreach ( $explicitGroups as $group ) {
@@ -65,7 +75,7 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 	/**
 	 * @return string[]
 	 */
-	protected function getGroupFilter( ReaderParams $params ): array {
+	protected function getGroupTypeFilter( ReaderParams $params ): array {
 		$filters = $params->getFilter();
 		foreach ( $filters as $filter ) {
 			if ( $filter->getField() === 'group_type' ) {

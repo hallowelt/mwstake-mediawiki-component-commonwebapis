@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore;
 
 use MediaWiki\Config\GlobalVarConfig;
+use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\Utils\Utility\GroupHelper;
 
@@ -13,13 +14,18 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	/** @var GlobalVarConfig */
 	protected $mwsgConfig;
 
+	/** @var HookContainer */
+	protected $hookContainer;
+
 	/**
 	 * @param GroupHelper $groupHelper
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param HookContainer $hookContainer
 	 */
-	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig ) {
+	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer ) {
 		$this->groupHelper = $groupHelper;
 		$this->mwsgConfig = $mwsgConfig;
+		$this->hookContainer = $hookContainer;
 	}
 
 	/**
@@ -35,7 +41,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 * @return PrimaryDataProvider
 	 */
 	public function makePrimaryDataProvider( $params ) {
-		return new PrimaryDataProvider( $this->groupHelper, $this->mwsgConfig );
+		return new PrimaryDataProvider( $this->groupHelper, $this->mwsgConfig, $this->hookContainer );
 	}
 
 	/**

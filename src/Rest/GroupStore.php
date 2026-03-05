@@ -21,7 +21,7 @@ class GroupStore extends QueryStore {
 		HookContainer $hookContainer, UtilityFactory $utilityFactory, GlobalVarConfig $mwsgConfig
 	) {
 		parent::__construct( $hookContainer );
-		$this->store = new Store( $utilityFactory, $mwsgConfig );
+		$this->store = new Store( $utilityFactory, $mwsgConfig, $hookContainer );
 	}
 
 	/**

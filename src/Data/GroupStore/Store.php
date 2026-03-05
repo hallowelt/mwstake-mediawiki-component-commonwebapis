@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore;
 
 use MediaWiki\Config\GlobalVarConfig;
+use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 
@@ -13,13 +14,20 @@ class Store implements IStore {
 	/** @var GlobalVarConfig */
 	protected $mwsgConfig;
 
+	/** @var HookContainer */
+	protected $hookContainer;
+
 	/**
 	 * @param UtilityFactory $utilityFactory
 	 * @param GlobalVarConfig $mwsgConfig
+	 * @param HookContainer $hookContainer
 	 */
-	public function __construct( UtilityFactory $utilityFactory, GlobalVarConfig $mwsgConfig ) {
+	public function __construct(
+		UtilityFactory $utilityFactory, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer
+	) {
 		$this->groupHelper = $utilityFactory->getGroupHelper();
 		$this->mwsgConfig = $mwsgConfig;
+		$this->hookContainer = $hookContainer;
 	}
 
 	/**
@@ -33,7 +41,7 @@ class Store implements IStore {
 	 * @return PrimaryDataProvider
 	 */
 	public function getReader() {
-		return new Reader( $this->groupHelper, $this->mwsgConfig );
+		return new Reader( $this->groupHelper, $this->mwsgConfig, $this->hookContainer );
 	}
 
 	/**
