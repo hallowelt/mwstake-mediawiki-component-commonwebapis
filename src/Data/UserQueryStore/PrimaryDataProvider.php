@@ -343,6 +343,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 */
 	private function getAllowedGroups( array $groups ): array {
 		$allowed = $this->utilityFactory->getGroupHelper()->getAvailableGroups();
-		return array_intersect( $groups, $allowed );
+		return array_values( array_intersect( $groups, $allowed ) );
 	}
 }

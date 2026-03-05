@@ -51,11 +51,13 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 			'blacklist' => $this->mwsgConfig->get( 'CommonWebAPIsComponentGroupStoreExcludeGroups' ),
 		] );
 		foreach ( $explicitGroups as $group ) {
+			$groupType = $this->groupHelper->getGroupType( $group );
 			$displayName = $group;
 			$msg = \Message::newFromKey( "group-$group" );
 			if ( $msg->exists() ) {
 				$displayName = $msg->plain() . " ($group)";
 			}
+			$this->hookContainer->run( 'MWStakeGroupStoreGroupDisplayName', [ $group, &$displayName, $groupType ] );
 
 			if ( !$this->queryApplies( $query, $group, $displayName ) ) {
 				continue;
@@ -63,8 +65,8 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 
 			$data[] = new GroupRecord( (object)[
 				'group_name' => $group,
-				'additional_group' => ( $this->groupHelper->getGroupType( $group ) === 'custom' ),
-				'group_type' => $this->groupHelper->getGroupType( $group ),
+				'additional_group' => ( $groupType === 'custom' ),
+				'group_type' => $groupType,
 				'displayname' => $displayName,
 				'usercount' => $this->groupHelper->countUsersInGroup( $group, true, true )
 			] );
