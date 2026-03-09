@@ -11,6 +11,9 @@ use MWStake\MediaWiki\Component\DataStore\Schema;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\ResultWrapper;
 
+/*
+ * @stable to extend
+ */
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 
 	/** @var Language */

@@ -8,6 +8,9 @@ use MWStake\MediaWiki\Component\DataStore\IPrimaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\Utils\Utility\GroupHelper;
 
+/*
+ * @stable to extend
+ */
 class PrimaryDataProvider implements IPrimaryDataProvider {
 	/**
 	 * @var GroupHelper

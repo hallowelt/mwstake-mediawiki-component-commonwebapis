@@ -7,6 +7,9 @@ use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 
+/*
+ * @stable to extend
+ */
 class Store implements IStore {
 	/** @var \MWStake\MediaWiki\Component\Utils\Utility\GroupHelper */
 	protected $groupHelper;
