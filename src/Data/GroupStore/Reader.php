@@ -20,15 +20,22 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	/** @var HookContainer */
 	protected $hookContainer;
 
+	/** @var bool */
+	private bool $allowEveryone;
+
 	/**
 	 * @param GroupHelper $groupHelper
 	 * @param GlobalVarConfig $mwsgConfig
 	 * @param HookContainer $hookContainer
+	 * @param bool $allowEveryone
 	 */
-	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer ) {
+	public function __construct(
+		GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer, bool $allowEveryone = false
+	) {
 		$this->groupHelper = $groupHelper;
 		$this->mwsgConfig = $mwsgConfig;
 		$this->hookContainer = $hookContainer;
+		$this->allowEveryone = $allowEveryone;
 	}
 
 	/**
@@ -44,7 +51,9 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 * @return PrimaryDataProvider
 	 */
 	public function makePrimaryDataProvider( $params ) {
-		return new PrimaryDataProvider( $this->groupHelper, $this->mwsgConfig, $this->hookContainer );
+		return new PrimaryDataProvider(
+			$this->groupHelper, $this->mwsgConfig, $this->hookContainer, $this->allowEveryone
+		);
 	}
 
 	/**

@@ -27,15 +27,22 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 	 */
 	protected $hookContainer;
 
+	/** @var bool */
+	private bool $allowEveryone;
+
 	/**
 	 * @param GroupHelper $groupHelper
 	 * @param GlobalVarConfig $mwsgConfig
 	 * @param HookContainer $hookContainer
+	 * @param bool $allowEveryone
 	 */
-	public function __construct( GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer ) {
+	public function __construct(
+		GroupHelper $groupHelper, GlobalVarConfig $mwsgConfig, HookContainer $hookContainer, bool $allowEveryone = false
+	) {
 		$this->groupHelper = $groupHelper;
 		$this->mwsgConfig = $mwsgConfig;
 		$this->hookContainer = $hookContainer;
+		$this->allowEveryone = $allowEveryone;
 	}
 
 	/**
@@ -53,6 +60,9 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 			'filter' => $typeFilter,
 			'blacklist' => $this->mwsgConfig->get( 'CommonWebAPIsComponentGroupStoreExcludeGroups' ),
 		] );
+		if ( $this->allowEveryone ) {
+			array_unshift( $explicitGroups, 'user' );
+		}
 		foreach ( $explicitGroups as $group ) {
 			$groupType = $this->groupHelper->getGroupType( $group );
 			$displayName = $group;

@@ -7,6 +7,7 @@ use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore\Store;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
+use Wikimedia\ParamValidator\ParamValidator;
 
 class GroupStore extends QueryStore {
 	/** @var Store */
@@ -28,6 +29,21 @@ class GroupStore extends QueryStore {
 	 * @return IStore
 	 */
 	protected function getStore(): IStore {
+		$allowEveryone = $this->getValidatedParams()['allowEveryone'] ?? false;
+		$this->store->setAllowEveryone( $allowEveryone );
 		return $this->store;
+	}
+
+	/**
+	 * @return array|array[]
+	 */
+	public function getStoreSpecificParams(): array {
+		return [
+			'allowEveryone' => [
+				static::PARAM_SOURCE => 'query',
+				ParamValidator::PARAM_TYPE => 'boolean',
+				ParamValidator::PARAM_DEFAULT => false
+			],
+		];
 	}
 }

@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore;
 use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\HookContainer\HookContainer;
 use MWStake\MediaWiki\Component\DataStore\IStore;
+use MWStake\MediaWiki\Component\DataStore\Schema;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 
 /*
@@ -20,6 +21,9 @@ class Store implements IStore {
 	/** @var HookContainer */
 	protected $hookContainer;
 
+	/** @var bool */
+	private $allowEveryone = false;
+
 	/**
 	 * @param UtilityFactory $utilityFactory
 	 * @param GlobalVarConfig $mwsgConfig
@@ -34,17 +38,25 @@ class Store implements IStore {
 	}
 
 	/**
-	 * @return UserSchema
+	 * @return Schema
 	 */
 	public function getSchema() {
 		return new GroupSchema();
 	}
 
 	/**
-	 * @return PrimaryDataProvider
+	 * @param bool $allow
+	 * @return void
+	 */
+	public function setAllowEveryone( bool $allow ): void {
+		$this->allowEveryone = $allow;
+	}
+
+	/**
+	 * @return \MWStake\MediaWiki\Component\DataStore\Reader
 	 */
 	public function getReader() {
-		return new Reader( $this->groupHelper, $this->mwsgConfig, $this->hookContainer );
+		return new Reader( $this->groupHelper, $this->mwsgConfig, $this->hookContainer, $this->allowEveryone );
 	}
 
 	/**
