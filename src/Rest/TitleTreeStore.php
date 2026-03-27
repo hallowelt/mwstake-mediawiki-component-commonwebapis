@@ -17,9 +17,6 @@ use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleTreeStore extends TitleQueryStore {
 
-	/** @var PermissionManager */
-	protected $permissionManager;
-
 	/**
 	 * @param HookContainer $hookContainer
 	 * @param ILoadBalancer $lb
@@ -33,8 +30,7 @@ class TitleTreeStore extends TitleQueryStore {
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
 		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
 	) {
-		parent::__construct( $hookContainer, $lb, $titleFactory, $language, $nsInfo, $pageProps );
-		$this->permissionManager = $permissionManager;
+		parent::__construct( $hookContainer, $lb, $titleFactory, $language, $nsInfo, $pageProps, $permissionManager );
 	}
 
 	/**

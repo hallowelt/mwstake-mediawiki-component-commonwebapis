@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
+use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\FileQueryStore\Store;
@@ -26,10 +27,12 @@ class FileQueryStore extends QueryStore {
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, \RepoGroup $repoGroup
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, \RepoGroup $repoGroup,
+		PermissionManager $permissionManager
 	) {
 		parent::__construct( $hookContainer );
-		$this->store = new Store( $lb, $titleFactory, $language, $nsInfo, $pageProps, $repoGroup );
+		$this->store = new Store( $lb, $titleFactory, $language, $nsInfo, $pageProps,
+			$repoGroup, $permissionManager );
 	}
 
 	/**
