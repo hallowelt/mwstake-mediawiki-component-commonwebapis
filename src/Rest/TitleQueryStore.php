@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
+use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\Store;
@@ -22,6 +23,8 @@ class TitleQueryStore extends QueryStore {
 	protected $nsInfo;
 	/** @var PageProps */
 	protected $pageProps;
+	/** @var PermissionManager */
+	protected $permissionManager;
 
 	/**
 	 * @param HookContainer $hookContainer
@@ -33,7 +36,7 @@ class TitleQueryStore extends QueryStore {
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
 	) {
 		parent::__construct( $hookContainer );
 		$this->lb = $lb;
@@ -41,12 +44,14 @@ class TitleQueryStore extends QueryStore {
 		$this->language = $language;
 		$this->nsInfo = $nsInfo;
 		$this->pageProps = $pageProps;
+		$this->permissionManager = $permissionManager;
 	}
 
 	/**
 	 * @return IStore
 	 */
 	protected function getStore(): IStore {
-		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps );
+		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo,
+		$this->pageProps, $this->permissionManager );
 	}
 }

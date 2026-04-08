@@ -21,16 +21,12 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var array */
 	private $nodeCache = [];
 
-	/** @var PermissionManager */
-	private $permissionManager;
-
 	/**
 	 * @inheritDoc
 	 */
 	public function __construct( IDatabase $db, Schema $schema, Language $language,
 		NamespaceInfo $nsInfo, PermissionManager $permissionManager ) {
-		parent::__construct( $db, $schema, $language, $nsInfo );
-		$this->permissionManager = $permissionManager;
+		parent::__construct( $db, $schema, $language, $nsInfo, $permissionManager );
 	}
 
 	/**

@@ -2,8 +2,11 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
+use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
+use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
+use MediaWiki\Title\Title;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -25,6 +28,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var NamespaceInfo */
 	protected $nsInfo;
 
+	/** @var PermissionManager */
+	protected $permissionManager;
+
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
@@ -32,11 +38,12 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @param NamespaceInfo $nsInfo
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo
+		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo, PermissionManager $permissionManager
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
 		$this->nsInfo = $nsInfo;
+		$this->permissionManager = $permissionManager;
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 
@@ -295,6 +302,11 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @return void
 	 */
 	protected function appendRowToData( \stdClass $row ) {
+		$user = RequestContext::getMain()->getUser();
+		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
+			return;
+		}
+
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => (int)$row->page_namespace,
