@@ -158,25 +158,31 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			}
 
 			// Apply namespace text filter
-			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE_TEXT ) {
+			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE_TEXT && !$filter->isApplied() ) {
 				$filterValue = $filter->getValue();
 
-				$nsIndex = $this->language->getLocalNsIndex( $filterValue );
-				if ( !$nsIndex ) {
-					$nsIndex = $this->nsInfo->getCanonicalIndex( strtolower( $filterValue ) );
+				if ( !is_array( $filterValue ) ) {
+					$filterValue = [ $filterValue ];
 				}
 
-				$filter->setApplied( true );
+				foreach ( $filterValue as $value ) {
+					$nsIndex = $this->language->getLocalNsIndex( $value );
+					if ( !$nsIndex ) {
+						$nsIndex = $this->nsInfo->getCanonicalIndex( strtolower( $value ) );
+					}
 
-				if ( $nsIndex === false ) {
-					continue;
+					$filter->setApplied( true );
+
+					if ( $nsIndex === false ) {
+						continue;
+					}
+
+					$filter = new Filter\StringValue( [
+						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
+						Filter::KEY_VALUE => [ (string)$nsIndex ],
+						Filter::KEY_COMPARISON => 'in'
+					] );
 				}
-
-				$filter = new Filter\StringValue( [
-					Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
-					Filter::KEY_VALUE => [ (string)$nsIndex ],
-					Filter::KEY_COMPARISON => 'in'
-				] );
 
 				$nsFilter = array_merge( $nsFilter, $filter->getValue() );
 			}
