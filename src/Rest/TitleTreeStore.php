@@ -2,19 +2,46 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
+use Language;
+use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\Permissions\PermissionManager;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore\Store;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore\TitleTreeReaderParams;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
+use NamespaceInfo;
+use PageProps;
+use TitleFactory;
 use Wikimedia\ParamValidator\ParamValidator;
+use Wikimedia\Rdbms\ILoadBalancer;
 
 class TitleTreeStore extends TitleQueryStore {
+
+	/** @var PermissionManager */
+	protected $permissionManager;
+
+	/**
+	 * @param HookContainer $hookContainer
+	 * @param ILoadBalancer $lb
+	 * @param TitleFactory $titleFactory
+	 * @param Language $language
+	 * @param NamespaceInfo $nsInfo
+	 * @param PageProps $pageProps
+	 * @param PermissionManager $permissionManager
+	 */
+	public function __construct(
+		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
+	) {
+		parent::__construct( $hookContainer, $lb, $titleFactory, $language, $nsInfo, $pageProps );
+		$this->permissionManager = $permissionManager;
+	}
 
 	/**
 	 * @return IStore
 	 */
 	protected function getStore(): IStore {
-		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps );
+		return new Store( $this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps, $this->permissionManager );
 	}
 
 	/**

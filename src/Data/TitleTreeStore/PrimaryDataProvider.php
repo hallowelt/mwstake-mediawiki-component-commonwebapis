@@ -2,8 +2,11 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
+use MediaWiki\Permissions\PermissionManager;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\DataStore\Schema;
+use RequestContext;
+use Title;
 use Wikimedia\Rdbms\IDatabase;
 
 class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider {
@@ -15,12 +18,17 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	/** @var \NamespaceInfo */
 	private $nsInfo;
 
+	/** @var PermissionManager */
+	private $permissionManager;
+
 	/**
 	 * @inheritDoc
 	 */
-	public function __construct( IDatabase $db, Schema $schema, \Language $language, \NamespaceInfo $nsInfo ) {
+	public function __construct( IDatabase $db, Schema $schema, \Language $language,
+		\NamespaceInfo $nsInfo, PermissionManager $permissionManager ) {
 		parent::__construct( $db, $schema, $language, $nsInfo );
 		$this->nsInfo = $nsInfo;
+		$this->permissionManager = $permissionManager;
 	}
 
 	/**
@@ -63,6 +71,12 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	protected function appendRowToData( \stdClass $row ) {
 		$indexTitle = $row->mti_title;
 		$uniqueId = $this->getUniqueId( $row );
+
+		$user = RequestContext::getMain()->getUser();
+		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
+			return;
+		}
+
 		if ( $this->isSubpage( $indexTitle ) &&
 			$this->nsInfo->hasSubpages( (int)$row->page_namespace ) ) {
 			if (
