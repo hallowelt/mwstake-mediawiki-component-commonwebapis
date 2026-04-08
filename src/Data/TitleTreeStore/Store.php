@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
+use MediaWiki\Permissions\PermissionManager;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
 
@@ -16,6 +17,8 @@ class Store implements IStore {
 	protected $nsInfo;
 	/** @var \PageProps */
 	protected $pageProps;
+	/** @var PermissionManager */
+	protected $permissionManager;
 
 	/**
 	 * @param ILoadBalancer $lb
@@ -23,16 +26,18 @@ class Store implements IStore {
 	 * @param \Language $language
 	 * @param \NamespaceInfo $nsInfo
 	 * @param \PageProps $pageProps
+	 * @param PermissionManager $permissionManager
 	 */
 	public function __construct(
 		ILoadBalancer $lb, \TitleFactory $titleFactory, \Language $language,
-		\NamespaceInfo $nsInfo, \PageProps $pageProps
+		\NamespaceInfo $nsInfo, \PageProps $pageProps, PermissionManager $permissionManager
 	) {
 		$this->lb = $lb;
 		$this->titleFactory = $titleFactory;
 		$this->language = $language;
 		$this->nsInfo = $nsInfo;
 		$this->pageProps = $pageProps;
+		$this->permissionManager = $permissionManager;
 	}
 
 	/**
@@ -47,7 +52,7 @@ class Store implements IStore {
 	 */
 	public function getReader() {
 		return new Reader(
-			$this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps
+			$this->lb, $this->titleFactory, $this->language, $this->nsInfo, $this->pageProps, $this->permissionManager
 		);
 	}
 
