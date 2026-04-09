@@ -49,7 +49,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 		$this->repoGroup = $repoGroup;
 		$this->permissionManager = $permissionManager;
 		if ( $this->permissionManager === null ) {
-			$this->permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 	}
 

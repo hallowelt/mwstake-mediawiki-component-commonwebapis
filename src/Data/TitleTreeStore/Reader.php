@@ -25,7 +25,7 @@ class Reader extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryS
 		NamespaceInfo $nsInfo, PageProps $pageProps, ?PermissionManager $permissionManager = null
 	) {
 		if ( $permissionManager === null ) {
-			$permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 		parent::__construct( $lb, $titleFactory, $language, $nsInfo, $pageProps, $permissionManager );
 	}

@@ -31,7 +31,7 @@ class TitleTreeStore extends TitleQueryStore {
 		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, ?PermissionManager $permissionManager = null
 	) {
 		if ( $permissionManager === null ) {
-			$permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 		parent::__construct( $hookContainer, $lb, $titleFactory, $language, $nsInfo, $pageProps, $permissionManager );
 	}

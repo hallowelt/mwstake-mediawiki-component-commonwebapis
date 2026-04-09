@@ -27,7 +27,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	public function __construct( IDatabase $db, Schema $schema, Language $language,
 		NamespaceInfo $nsInfo, ?PermissionManager $permissionManager = null ) {
 		if ( $permissionManager === null ) {
-			$permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 		parent::__construct( $db, $schema, $language, $nsInfo, $permissionManager );
 	}

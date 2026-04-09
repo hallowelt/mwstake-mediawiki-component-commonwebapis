@@ -47,7 +47,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		$this->nsInfo = $nsInfo;
 		$this->permissionManager = $permissionManager;
 		if ( $this->permissionManager === null ) {
-			$this->permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}

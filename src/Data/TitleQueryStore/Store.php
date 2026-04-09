@@ -46,7 +46,7 @@ class Store implements IStore {
 		$this->pageProps = $pageProps;
 		$this->permissionManager = $permissionManager;
 		if ( $this->permissionManager === null ) {
-			$this->permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 	}
 

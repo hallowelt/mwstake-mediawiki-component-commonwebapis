@@ -33,7 +33,7 @@ class FileQueryStore extends QueryStore {
 	) {
 		parent::__construct( $hookContainer );
 		if ( $permissionManager === null ) {
-			$permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+			$permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
 		}
 		$this->store = new Store( $lb, $titleFactory, $language, $nsInfo, $pageProps,
 			$repoGroup, $permissionManager );
