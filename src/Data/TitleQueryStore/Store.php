@@ -5,6 +5,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Permissions\PermissionManager;
 
 class Store implements IStore {
 	/** @var ILoadBalancer */

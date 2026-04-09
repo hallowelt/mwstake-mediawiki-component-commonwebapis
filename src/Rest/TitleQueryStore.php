@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
 use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\Permissions\PermissionManager;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\Store;
 use MWStake\MediaWiki\Component\DataStore\IStore;
 use Wikimedia\Rdbms\ILoadBalancer;
