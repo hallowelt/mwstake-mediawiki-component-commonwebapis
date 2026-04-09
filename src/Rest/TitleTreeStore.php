@@ -24,12 +24,15 @@ class TitleTreeStore extends TitleQueryStore {
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
-	 * @param PermissionManager $permissionManager
+	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, ?PermissionManager $permissionManager = null
 	) {
+		if ( $permissionManager === null ) {
+			$permissionManager = MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 		parent::__construct( $hookContainer, $lb, $titleFactory, $language, $nsInfo, $pageProps, $permissionManager );
 	}
 
