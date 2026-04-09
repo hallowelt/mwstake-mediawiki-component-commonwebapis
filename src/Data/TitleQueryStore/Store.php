@@ -33,11 +33,11 @@ class Store implements IStore {
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
-	 * @param PermissionManager $permissionManager
+	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
-		NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
+		NamespaceInfo $nsInfo, PageProps $pageProps, ?PermissionManager $permissionManager = null
 	) {
 		$this->lb = $lb;
 		$this->titleFactory = $titleFactory;
@@ -45,6 +45,9 @@ class Store implements IStore {
 		$this->nsInfo = $nsInfo;
 		$this->pageProps = $pageProps;
 		$this->permissionManager = $permissionManager;
+		if ( $this->permissionManager === null ) {
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 	}
 
 	/**

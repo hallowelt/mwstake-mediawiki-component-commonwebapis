@@ -33,10 +33,11 @@ class TitleQueryStore extends QueryStore {
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
+	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, PermissionManager $permissionManager
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, ?PermissionManager $permissionManager = null
 	) {
 		parent::__construct( $hookContainer );
 		$this->lb = $lb;
@@ -45,6 +46,9 @@ class TitleQueryStore extends QueryStore {
 		$this->nsInfo = $nsInfo;
 		$this->pageProps = $pageProps;
 		$this->permissionManager = $permissionManager;
+		if ( $this->permissionManager === null ) {
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 	}
 
 	/**

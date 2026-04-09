@@ -33,12 +33,12 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
 	 * @param \RepoGroup $repoGroup
-	 * @param PermissionManager $permissionManager
+	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
 		NamespaceInfo $nsInfo, PageProps $pageProps, \RepoGroup $repoGroup,
-		PermissionManager $permissionManager
+		?PermissionManager $permissionManager = null
 	) {
 		parent::__construct();
 		$this->lb = $lb;
@@ -48,6 +48,9 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 		$this->pageProps = $pageProps;
 		$this->repoGroup = $repoGroup;
 		$this->permissionManager = $permissionManager;
+		if ( $this->permissionManager === null ) {
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 	}
 
 	/**
