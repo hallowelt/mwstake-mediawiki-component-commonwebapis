@@ -16,17 +16,30 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var array */
 	protected $contentNamespaces;
 
+	/** @var \NamespaceInfo */
+	protected $nsInfo;
+
+	/** @var \PermissionManager */
+	protected $permissionManager;
+
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
 	 * @param \Language $language
 	 * @param \NamespaceInfo $nsInfo
+	 * @param \PermissionManager|null $permissionManager
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, \Language $language, \NamespaceInfo $nsInfo
+		IDatabase $db, Schema $schema, \Language $language, \NamespaceInfo $nsInfo,
+		?PermissionManager $permissionManager = null
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
+		$this->nsInfo = $nsInfo;
+		$this->permissionManager = $permissionManager;
+		if ( $this->permissionManager === null ) {
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 

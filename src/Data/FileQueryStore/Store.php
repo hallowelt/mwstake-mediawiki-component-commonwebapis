@@ -18,6 +18,8 @@ class Store implements IStore {
 	protected $pageProps;
 	/** @var \RepoGroup */
 	protected $repoGroup;
+	/** @var \PermissionManager */
+	protected $permissionManager;
 
 
 	/**
@@ -27,10 +29,12 @@ class Store implements IStore {
 	 * @param \NamespaceInfo $nsInfo
 	 * @param \PageProps $pageProps
 	 * @param \RepoGroup $repoGroup
+	 * @param \PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		ILoadBalancer $lb, \TitleFactory $titleFactory, \Language $language,
-		\NamespaceInfo $nsInfo, \PageProps $pageProps, \RepoGroup $repoGroup
+		\NamespaceInfo $nsInfo, \PageProps $pageProps, \RepoGroup $repoGroup,
+		?PermissionManager $permissionManager = null
 	) {
 		$this->lb = $lb;
 		$this->titleFactory = $titleFactory;
@@ -38,6 +42,10 @@ class Store implements IStore {
 		$this->nsInfo = $nsInfo;
 		$this->pageProps = $pageProps;
 		$this->repoGroup = $repoGroup;
+		$this->permissionManager = $permissionManager;
+		if ( $this->permissionManager === null ) {
+			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
+		}
 	}
 
 	/**
