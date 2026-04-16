@@ -113,14 +113,6 @@ class TitleIndexUpdater implements
 		if ( !$page->exists() ) {
 			return false;
 		}
-		// Cheaper to delete and insert, then to check if it exists
-		$db->delete(
-			'mws_title_index',
-			[
-				'mti_page_id' => $forceId ?? $page->getId()
-			],
-			__METHOD__
-		);
 
 		$leaf = '';
 		if ( strpos( $page->getDBkey(), '/' ) !== false ) {
