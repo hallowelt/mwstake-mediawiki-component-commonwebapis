@@ -48,4 +48,18 @@ class PrimaryDataProvider extends TitlePrimaryProvider {
 
 		return $conds;
 	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function getTotal( ReaderParams $params ): int {
+		$params = CategoryReaderParams::newFromOtherReaderParams( $params );
+		$row = $this->db->selectRow(
+			[ 'mws_category_index', 'category' ],
+			[ 'COUNT(*) AS cnt' ],
+			$this->makePreFilterConds( $params ),
+			__METHOD__
+		);
+		return $row ? (int)$row->cnt : 0;
+	}
 }

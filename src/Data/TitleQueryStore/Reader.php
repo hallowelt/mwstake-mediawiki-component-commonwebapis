@@ -7,7 +7,10 @@ use MediaWiki\Page\PageProps;
 use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
+use MWStake\MediaWiki\Component\CommonWebAPIs\Data\PermissionTrimmer;
+use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
+use MWStake\MediaWiki\Component\DataStore\ResultSet;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 /*
@@ -52,7 +55,7 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	}
 
 	/**
-	 * @return UserSchema
+	 * @return TitleSchema
 	 */
 	public function getSchema() {
 		return new TitleSchema();
@@ -75,5 +78,52 @@ class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {
 	 */
 	public function makeSecondaryDataProvider() {
 		return new SecondaryDataProvider( $this->titleFactory, $this->language, $this->pageProps );
+	}
+
+	/**
+	 * @param ReaderParams $params
+	 * @return PermissionTrimmer
+	 */
+	protected function makeTrimmer( $params ) {
+		return new PermissionTrimmer(
+			$params->getLimit(),
+			$params->getStart(),
+			$this->permissionManager
+		);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function read( $params ) {
+		$primaryDataProvider = $this->makePrimaryDataProvider( $params );
+		$dataSets = $primaryDataProvider->makeData( $params );
+
+		$filterer = $this->makeFilterer( $params );
+		$dataSets = $filterer->filter( $dataSets );
+
+		// Use a separate COUNT query for accurate total (pre-permission).
+		// When a query is set, reranking may exclude rows, so use the in-memory count.
+		if ( $params->getQuery() !== '' ) {
+			$total = count( $dataSets );
+		} else {
+			$total = $primaryDataProvider->getTotal( $params );
+		}
+
+		$sorter = $this->makeSorter( $params );
+		$dataSets = $sorter->sort(
+			$dataSets,
+			$this->getSchema()->getUnsortableFields()
+		);
+
+		$trimmer = $this->makeTrimmer( $params );
+		$dataSets = $trimmer->trim( $dataSets );
+
+		$secondaryDataProvider = $this->makeSecondaryDataProvider();
+		if ( $secondaryDataProvider instanceof ISecondaryDataProvider ) {
+			$dataSets = $secondaryDataProvider->extend( $dataSets );
+		}
+
+		return new ResultSet( $dataSets, $total );
 	}
 }
