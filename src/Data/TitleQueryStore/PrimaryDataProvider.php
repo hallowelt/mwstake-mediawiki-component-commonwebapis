@@ -2,11 +2,9 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
 use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
-use MediaWiki\Title\Title;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -18,6 +16,12 @@ use Wikimedia\Rdbms\ResultWrapper;
  * @stable to extend
  */
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
+
+	/**
+	 * Factor by which to over-fetch rows from the database to account for
+	 * rows that may be filtered out by permission checks.
+	 */
+	protected const OVERFETCH_FACTOR = 5;
 
 	/** @var Language */
 	protected $language;
@@ -307,11 +311,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @return void
 	 */
 	protected function appendRowToData( \stdClass $row ) {
-		$user = RequestContext::getMain()->getUser();
-		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
-			return;
-		}
-
+		// Permission checks are performed in the "Trimmer" phase for performance reasons
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => (int)$row->page_namespace,
@@ -325,6 +325,37 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			TitleRecord::BASE_TITLE => '',
 			'_score' => $row->_score ?? 0
 		] );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function makePreOptionConds( ReaderParams $params ) {
+		$conds = parent::makePreOptionConds( $params );
+		// Only apply SQL LIMIT when there is no free-text query,
+		// because reranking requires the full result set.
+		if ( $params->getQuery() === '' && $params->getLimit() !== ReaderParams::LIMIT_INFINITE ) {
+			$conds['LIMIT'] = ( $params->getStart() + $params->getLimit() ) * static::OVERFETCH_FACTOR;
+		}
+		return $conds;
+	}
+
+	/**
+	 * Get the total count of records matching the current filters (without LIMIT).
+	 *
+	 * @param ReaderParams $params
+	 * @return int
+	 */
+	public function getTotal( ReaderParams $params ): int {
+		$row = $this->db->selectRow(
+			$this->getTableNames(),
+			[ 'COUNT(*) AS cnt' ],
+			$this->makePreFilterConds( $params ),
+			__METHOD__,
+			[],
+			$this->getJoinConds( $params )
+		);
+		return $row ? (int)$row->cnt : 0;
 	}
 
 	/**
