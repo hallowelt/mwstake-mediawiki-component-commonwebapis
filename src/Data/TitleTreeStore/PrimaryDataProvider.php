@@ -89,6 +89,7 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 	protected function appendRowToData( \stdClass $row ) {
 		$indexTitle = $row->mti_title;
 		$uniqueId = $this->getUniqueId( $row );
+		// Permission checks are performed in the "Trimmer" phase for performance reasons
 
 		if ( $this->isSubpage( $indexTitle ) &&
 			$this->nsInfo->hasSubpages( (int)$row->page_namespace ) ) {

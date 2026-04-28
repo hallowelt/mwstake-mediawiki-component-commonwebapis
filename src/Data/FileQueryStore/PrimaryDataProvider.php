@@ -170,6 +170,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	 * @return void
 	 */
 	protected function appendRowToData( \stdClass $row ) {
+		// Permission checks are performed in the "Trimmer" phase for performance reasons
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => NS_FILE,
