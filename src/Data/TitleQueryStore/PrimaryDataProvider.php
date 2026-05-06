@@ -2,11 +2,8 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
-use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
-use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\Title\NamespaceInfo;
-use MediaWiki\Title\Title;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -28,27 +25,18 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var NamespaceInfo */
 	protected $nsInfo;
 
-	/** @var PermissionManager */
-	protected $permissionManager;
-
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
-	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo,
-		?PermissionManager $permissionManager = null
+		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
 		$this->nsInfo = $nsInfo;
-		$this->permissionManager = $permissionManager;
-		if ( $this->permissionManager === null ) {
-			$this->permissionManager = \MediaWiki\MediaWikiServices::getInstance()->getPermissionManager();
-		}
 		$this->contentNamespaces = $nsInfo->getContentNamespaces();
 	}
 
@@ -287,7 +275,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	protected function getFields() {
 		return [
 			'mti_page_id', 'mti_title', 'mti_displaytitle', 'mti_leaf_title', 'page_namespace', 'page_title',
-			'page_content_model', 'page_lang'
+			'page_content_model', 'page_lang', 'mti_first_letter'
 		];
 	}
 
@@ -307,11 +295,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @return void
 	 */
 	protected function appendRowToData( \stdClass $row ) {
-		$user = RequestContext::getMain()->getUser();
-		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
-			return;
-		}
-
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => (int)$row->page_namespace,
@@ -323,7 +306,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			TitleRecord::PAGE_EXISTS => true,
 			TitleRecord::LEAF_TITLE => '',
 			TitleRecord::BASE_TITLE => '',
-			'_score' => $row->_score ?? 0
+			'_score' => $row->_score ?? 0,
+			TitleRecord::SORTKEY => $row->mti_first_letter
 		] );
 	}
 

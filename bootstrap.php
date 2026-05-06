@@ -6,7 +6,7 @@ if ( defined( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION' ) ) {
 	return;
 }
 
-define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '3.1.14' );
+define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '4.0.0' );
 
 MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 	->register( 'commonwebapis', static function () {
@@ -17,7 +17,8 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 		$GLOBALS['wgExtensionFunctions'][] = static function () {
 			$lb = \MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer();
 			$pageProps = \MediaWiki\MediaWikiServices::getInstance()->getPageProps();
-			$titleIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\TitleIndexUpdater( $lb, $pageProps );
+			$collationFactory = \MediaWiki\MediaWikiServices::getInstance()->getCollationFactory();
+			$titleIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\TitleIndexUpdater( $lb, $pageProps, $collationFactory );
 			$userIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\UserIndexUpdater( $lb );
 			$categoryIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\CategoryIndexUpdater( $lb );
 			$hookContainer = \MediaWiki\MediaWikiServices::getInstance()->getHookContainer();
@@ -56,6 +57,11 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 					'mws_title_index',
 					'mti_leaf_title',
 					__DIR__ . "/sql/$dbType/mws_title_index_leafpage_patch.sql"
+				);
+				$updater->addExtensionField(
+					'mws_title_index',
+					'mti_first_letter',
+					__DIR__ . "/sql/$dbType/mws_title_index_first_letter_patch.sql"
 				);
 
 				$updater->addPostDatabaseUpdateMaintenance(

@@ -172,10 +172,6 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	 * @return void
 	 */
 	protected function appendRowToData( \stdClass $row ) {
-		$user = RequestContext::getMain()->getUser();
-		if ( !$this->permissionManager->userCan( 'read', $user, Title::newFromRow( $row ) ) ) {
-			return;
-		}
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => NS_FILE,
