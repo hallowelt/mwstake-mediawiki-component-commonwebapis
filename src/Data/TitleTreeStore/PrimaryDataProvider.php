@@ -3,10 +3,11 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
 use MediaWiki\MediaWikiServices;
+use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider as TitlePrimaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\IBucketProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 
-class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider implements IBucketProvider {
+class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketProvider {
 	/** @var string|null */
 	private $query = null;
 	/** @var array|null */
@@ -56,7 +57,10 @@ class PrimaryDataProvider extends \MWStake\MediaWiki\Component\CommonWebAPIs\Dat
 			$this->appendRowToData( $row );
 		}
 
-		$sortkeyIndex = new SortkeyBucketProvider( MediaWikiServices::getInstance()->getCollationFactory() );
+		$sortkeyIndex = new SortkeyBucketProvider(
+			MediaWikiServices::getInstance()->getCollationFactory(),
+			MediaWikiServices::getInstance()->getContentLanguage()
+		);
 		$this->buckets = $sortkeyIndex->getBuckets( $this->data );
 
 		return array_values( $this->data );

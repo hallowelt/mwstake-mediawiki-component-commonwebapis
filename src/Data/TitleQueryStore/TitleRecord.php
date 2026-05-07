@@ -30,7 +30,7 @@ class TitleRecord extends Record implements IContinueAwareRecord {
 	 */
 	public function getTitle( TitleFactory $titleFactory ): ?Title {
 		return $titleFactory->makeTitleSafe(
-			$this->get( self::PAGE_NAMESPACE), $this->get( self::PAGE_DBKEY )
+			$this->get( self::PAGE_NAMESPACE ), $this->get( self::PAGE_DBKEY )
 		);
 	}
 

@@ -1,6 +1,7 @@
 <?php
 
 use MediaWiki\Installer\DatabaseUpdater;
+use MWStake\MediaWiki\Component\CommonWebAPIs\TitleIndexUpdater;
 
 if ( defined( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION' ) ) {
 	return;
@@ -18,7 +19,8 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 			$lb = \MediaWiki\MediaWikiServices::getInstance()->getDBLoadBalancer();
 			$pageProps = \MediaWiki\MediaWikiServices::getInstance()->getPageProps();
 			$collationFactory = \MediaWiki\MediaWikiServices::getInstance()->getCollationFactory();
-			$titleIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\TitleIndexUpdater( $lb, $pageProps, $collationFactory );
+			$contentLanguage = \MediaWiki\MediaWikiServices::getInstance()->getContentLanguage();
+			$titleIndexUpdater = new TitleIndexUpdater( $lb, $pageProps, $collationFactory, $contentLanguage );
 			$userIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\UserIndexUpdater( $lb );
 			$categoryIndexUpdater = new \MWStake\MediaWiki\Component\CommonWebAPIs\CategoryIndexUpdater( $lb );
 			$hookContainer = \MediaWiki\MediaWikiServices::getInstance()->getHookContainer();

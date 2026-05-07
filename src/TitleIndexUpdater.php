@@ -6,6 +6,7 @@ use ManualLogEntry;
 use MediaWiki\Collation\CollationFactory;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
+use MediaWiki\Language\Language;
 use MediaWiki\Page\Hook\PageDeleteCompleteHook;
 use MediaWiki\Page\Hook\PageUndeleteCompleteHook;
 use MediaWiki\Page\PageIdentity;
@@ -42,14 +43,24 @@ class TitleIndexUpdater implements
 	private $collationFactory;
 
 	/**
+	 * @var Language
+	 */
+	private $contentLanguage;
+
+	/**
 	 * @param ILoadBalancer $lb
 	 * @param PageProps $pageProps
 	 * @param CollationFactory $collationFactory
+	 * @param Language $contentLanguage
 	 */
-	public function __construct( ILoadBalancer $lb, PageProps $pageProps, CollationFactory $collationFactory ) {
+	public function __construct(
+		ILoadBalancer $lb, PageProps $pageProps,
+		CollationFactory $collationFactory, Language $contentLanguage
+	) {
 		$this->lb = $lb;
 		$this->pageProps = $pageProps;
 		$this->collationFactory = $collationFactory;
+		$this->contentLanguage = $contentLanguage;
 	}
 
 	/**
@@ -196,7 +207,7 @@ class TitleIndexUpdater implements
 	 */
 	private function getFirstLetter( string $dbkey ): string {
 		$title = str_replace( '_', ' ', explode( '/', $dbkey )[0] );
-		$collation = $this->collationFactory->getCategoryCollation();
+		$collation = $this->collationFactory->makeCollation( 'uca-' . $this->contentLanguage->getCode() );
 		$letter = $collation->getFirstLetter( $title );
 
 		if ( $letter === '' ) {
