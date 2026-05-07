@@ -248,7 +248,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		if ( !empty( $nsFilter ) ) {
 			$nsFilter = array_diff( $nsFilter, $restrictedNamespaces );
 			$conds[] = 'mti_namespace IN (' . $this->db->makeList( $nsFilter ) . ')';
-		} else if ( !empty( $restrictedNamespaces ) ) {
+		} elseif ( !empty( $restrictedNamespaces ) ) {
 			$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $restrictedNamespaces ) . ')';
 		}
 
