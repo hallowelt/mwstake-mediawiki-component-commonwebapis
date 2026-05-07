@@ -27,7 +27,8 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 		);
 
 		$collationFactory = $this->getServiceContainer()->getCollationFactory();
-		$collation = $collationFactory->getCategoryCollation();
+		$contentLanguage = $this->getServiceContainer()->getContentLanguage();
+		$collation = $collationFactory->makeCollation( 'uca-' . $contentLanguage->getCode() );
 
 		$toInsert = [];
 		$cnt = 0;
