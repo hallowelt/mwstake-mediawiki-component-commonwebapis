@@ -277,7 +277,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketPro
 	 * @return bool
 	 */
 	private function compareTitleMatchQuery( $title ) {
-		$title = mb_strtolower( str_replace('_', ' ', $title ) );
+		$title = mb_strtolower( str_replace( '_', ' ', $title ) );
 		$query = mb_strtolower( $this->query );
 		return str_contains( $title, $query );
 	}
