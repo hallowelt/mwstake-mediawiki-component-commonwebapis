@@ -46,9 +46,12 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 				break;
 			} catch ( \RuntimeException $e ) {
 				// locale not in TAILORING_FIRST_LETTERS, try next fallback
+				continue;
 			}
-			// should never reach here
+		}
+		if ( $collation === null ) {
 			$collation = $collationFactory->makeCollation( 'uca-en' );
+			$collation->getFirstLetter( 'a' );
 		}
 
 		$toInsert = [];
