@@ -31,9 +31,11 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 		// especially when not called using run.php + class name
 		$collationFactory = $this->getServiceContainer()->getCollationFactory();
 		$languageFallback = $this->getServiceContainer()->getLanguageFallback();
-		$languageCode = $this->getServiceContainer()->getContentLanguage()->getCode();
-		// getAll() in MESSAGES mode always terminates with 'en', so this loop always finds a match
-		$candidates = array_merge( [ $languageCode ], $languageFallback->getAll( $languageCode ) );
+		$code = $this->getServiceContainer()->getContentLanguage()->getCode();
+		$normalized = preg_replace( '/-(formal|informal)$/i', '', $code ) ?: $code;
+		$candidates = array_values( array_unique(
+			array_merge( [ $normalized ], $languageFallback->getAll( $normalized ) )
+		) );
 		$collation = null;
 		foreach ( $candidates as $candidate ) {
 			try {
@@ -45,6 +47,8 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 			} catch ( \RuntimeException $e ) {
 				// locale not in TAILORING_FIRST_LETTERS, try next fallback
 			}
+			// should never reach here
+			$collation = $collationFactory->makeCollation( 'uca-en' );
 		}
 
 		$toInsert = [];
