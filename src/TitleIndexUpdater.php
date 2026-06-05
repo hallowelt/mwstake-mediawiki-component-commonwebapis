@@ -26,6 +26,7 @@ class TitleIndexUpdater implements
 	PageUndeleteCompleteHook,
 	AfterImportPageHook
 {
+	use ContentLanguageCollationTrait;
 
 	/**
 	 * @var ILoadBalancer
@@ -202,7 +203,7 @@ class TitleIndexUpdater implements
 	 */
 	private function getFirstLetter( string $dbkey ): string {
 		$title = str_replace( '_', ' ', explode( '/', $dbkey )[0] );
-		$collation = $this->collationFactory->makeCollation( 'uca-' . $this->contentLanguage->getCode() );
+		$collation = $this->resolveCollation( $this->collationFactory, $this->contentLanguage );
 		$letter = $collation->getFirstLetter( $title );
 
 		if ( $letter === '' ) {
