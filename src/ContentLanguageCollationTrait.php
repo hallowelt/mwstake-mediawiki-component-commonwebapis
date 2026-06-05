@@ -29,7 +29,8 @@ trait ContentLanguageCollationTrait {
 			try {
 				$c = $collationFactory->makeCollation( 'uca-' . $candidate );
 				$c->getFirstLetter( 'a' );
-				return $this->resolvedCollation = $c;
+				$this->resolvedCollation = $c;
+				return $c;
 			} catch ( \RuntimeException $e ) {
 				continue;
 			}
@@ -38,6 +39,7 @@ trait ContentLanguageCollationTrait {
 		// should never reach here though
 		$fallback = $collationFactory->makeCollation( 'uca-en' );
 		$fallback->getFirstLetter( 'a' );
-		return $this->resolvedCollation = $fallback;
+		$this->resolvedCollation = $fallback;
+		return $fallback;
 	}
 }
