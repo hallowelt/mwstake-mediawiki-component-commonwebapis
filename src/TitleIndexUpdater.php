@@ -202,8 +202,13 @@ class TitleIndexUpdater implements
 	 */
 	private function getFirstLetter( string $dbkey ): string {
 		$title = str_replace( '_', ' ', explode( '/', $dbkey )[0] );
-		$collation = $this->collationFactory->makeCollation( 'uca-' . $this->contentLanguage->getCode() );
-		$letter = $collation->getFirstLetter( $title );
+		$code = $this->normalizeLanguageCode( $this->contentLanguage->getCode() );
+		$collation = $this->collationFactory->makeCollation( 'uca-' . $code );
+		try {
+			$letter = $collation->getFirstLetter( $title );
+		} catch ( \Throwable $ex ) {
+			$letter = '';
+		}
 
 		if ( $letter === '' ) {
 			return '#';
@@ -212,5 +217,20 @@ class TitleIndexUpdater implements
 			return '0-9';
 		}
 		return $letter;
+	}
+
+	/**
+	 * @param string|null $code
+	 * @return string
+	 */
+	private function normalizeLanguageCode( ?string $code ): string {
+		if ( !$code ) {
+			throw new \RuntimeException( 'Invalid content language set' );
+		}
+		if ( str_contains( $code, '-' ) ) {
+			$parts = explode( '-', $code );
+			return $parts[0];
+		}
+		return $code;
 	}
 }

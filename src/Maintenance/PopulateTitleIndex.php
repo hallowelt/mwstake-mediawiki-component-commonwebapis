@@ -28,7 +28,8 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 
 		$collationFactory = $this->getServiceContainer()->getCollationFactory();
 		$contentLanguage = $this->getServiceContainer()->getContentLanguage();
-		$collation = $collationFactory->makeCollation( 'uca-' . $contentLanguage->getCode() );
+		$code = $this->normalizeCode( $contentLanguage->getCode() );
+		$collation = $collationFactory->makeCollation( 'uca-' . $code );
 
 		$toInsert = [];
 		$cnt = 0;
@@ -41,11 +42,15 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 			}
 
 			$rootTitle = str_replace( '_', ' ', explode( '/', $title->page_title )[0] );
-			$firstLetter = $collation->getFirstLetter( $rootTitle );
-			if ( $firstLetter === '' ) {
-				$firstLetter = '#';
-			} elseif ( ctype_digit( $firstLetter ) ) {
-				$firstLetter = '0-9';
+			try {
+				$firstLetter = $collation->getFirstLetter( $rootTitle );
+				if ( $firstLetter === '' ) {
+					$firstLetter = '#';
+				} elseif ( ctype_digit( $firstLetter ) ) {
+					$firstLetter = '0-9';
+				}
+			} catch ( \Throwable $ex ) {
+				$firstLetter = '';
 			}
 
 			$toInsert[] = [
@@ -88,8 +93,24 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 	 * @return string
 	 */
 	protected function getUpdateKey() {
-		return 'mws-title-index-init-with-redirect-with-leaf-with-first-letter';
+		return 'mws-title-index-init-with-redirect-with-leaf-with-first-letter-and-parent';
 	}
+
+	/**
+	 * @param string|null $code
+	 * @return string
+	 */
+	private function normalizeCode( ?string $code ): string {
+		if ( !$code ) {
+			throw new \RuntimeException( 'Invalid content language set' );
+		}
+		if ( str_contains( $code, '-' ) ) {
+			$parts = explode( '-', $code );
+			return $parts[0];
+		}
+		return $code;
+	}
+
 }
 
 $maintClass = PopulateTitleIndex::class;
