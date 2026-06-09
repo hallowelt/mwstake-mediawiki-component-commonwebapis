@@ -7,7 +7,7 @@ if ( defined( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION' ) ) {
 	return;
 }
 
-define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '4.0.3' );
+define( 'MWSTAKE_MEDIAWIKI_COMPONENT_COMMONWEBAPIS_VERSION', '4.0.2' );
 
 MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 	->register( 'commonwebapis', static function () {
@@ -104,7 +104,7 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 
 		// Exclude users from these groups in user store
 		$GLOBALS['mwsgCommonWebAPIsComponentUserStoreExcludeGroups'] = [ 'bot' ];
-		// Exclude particular users from user store
+		// Exclude porticular users from user store
 		$GLOBALS['mwsgCommonWebAPIsComponentUserStoreExcludeUsers'] = array_merge(
 			$GLOBALS['wgReservedUsernames'] ?? [], [ 'Mediawiki default' ]
 		);
