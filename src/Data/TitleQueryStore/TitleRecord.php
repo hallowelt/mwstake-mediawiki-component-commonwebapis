@@ -23,6 +23,7 @@ class TitleRecord extends Record implements IContinueAwareRecord {
 	public const LEAF_TITLE = 'leaf_title';
 	public const BASE_TITLE = 'base_title';
 	public const SORTKEY = 'sortkey';
+	public const WIKI_ID = 'wiki_id';
 
 	/**
 	 * @param TitleFactory $titleFactory
@@ -38,7 +39,11 @@ class TitleRecord extends Record implements IContinueAwareRecord {
 	 * @return array
 	 */
 	public function getContinueValue(): array {
-		return [ $this->get( self::PAGE_NAMESPACE ), $this->get( self::PAGE_DBKEY ) ];
+		return [
+			$this->get( self::PAGE_NAMESPACE ),
+			$this->get( self::PAGE_DBKEY ),
+			$this->get( self::WIKI_ID )
+		];
 	}
 
 	/**
@@ -46,8 +51,9 @@ class TitleRecord extends Record implements IContinueAwareRecord {
 	 * @return bool
 	 */
 	public function matchesContinueValue( array $continueValue ): bool {
-		return count( $continueValue ) === 2 &&
+		return count( $continueValue ) === 3 &&
 			$this->get( self::PAGE_NAMESPACE ) === $continueValue[0] &&
-			$this->get( self::PAGE_DBKEY ) === $continueValue[1];
+			$this->get( self::PAGE_DBKEY ) === $continueValue[1] &&
+			$this->get( self::WIKI_ID ) === $continueValue[2];
 	}
 }

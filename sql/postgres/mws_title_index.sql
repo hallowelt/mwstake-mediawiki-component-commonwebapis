@@ -4,12 +4,16 @@
 -- See https://www.mediawiki.org/wiki/Manual:Schema_changes
 CREATE TABLE mws_title_index (
   mti_page_id INT NOT NULL,
+  mti_wiki_id TEXT DEFAULT '' NOT NULL,
   mti_namespace INT NOT NULL,
   mti_title TEXT NOT NULL,
   mti_displaytitle TEXT NOT NULL,
   mti_leaf_title TEXT NOT NULL,
-  mti_first_letter TEXT NOT NULL DEFAULT '',
-  PRIMARY KEY(mti_page_id)
+  mti_first_letter TEXT DEFAULT '' NOT NULL,
+  mti_db_key TEXT NOT NULL,
+  mti_page_lang TEXT NOT NULL,
+  mti_content_model TEXT NOT NULL,
+  PRIMARY KEY(mti_page_id, mti_wiki_id)
 );
 
 CREATE INDEX mws_title_index_title_index ON mws_title_index (mti_title);

@@ -4,14 +4,18 @@
 -- See https://www.mediawiki.org/wiki/Manual:Schema_changes
 CREATE TABLE /*_*/mws_title_index (
   mti_page_id INT UNSIGNED NOT NULL,
+  mti_wiki_id VARBINARY(255) DEFAULT '' NOT NULL,
   mti_namespace INT UNSIGNED NOT NULL,
   mti_title VARBINARY(255) NOT NULL,
   mti_displaytitle VARBINARY(255) NOT NULL,
   mti_leaf_title VARBINARY(255) NOT NULL,
-  mti_first_letter VARBINARY(32) NOT NULL DEFAULT '',
+  mti_first_letter VARBINARY(32) DEFAULT '' NOT NULL,
+  mti_db_key VARBINARY(255) NOT NULL,
+  mti_page_lang VARBINARY(255) NOT NULL,
+  mti_content_model VARBINARY(255) NOT NULL,
   INDEX mws_title_index_title_index (mti_title),
   INDEX mws_title_index_displaytitle_index (mti_displaytitle),
   INDEX mws_title_index_leaftitle_index (mti_leaf_title),
   INDEX mws_title_index_first_letter_index (mti_first_letter, mti_namespace),
-  PRIMARY KEY(mti_page_id)
+  PRIMARY KEY(mti_page_id, mti_wiki_id)
 ) /*$wgDBTableOptions*/;

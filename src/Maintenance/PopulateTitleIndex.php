@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance;
 
 use MediaWiki\Maintenance\LoggedUpdateMaintenance;
+use MediaWiki\WikiMap\WikiMap;
 
 $maintPath = dirname( __DIR__, 5 ) . '/maintenance/Maintenance.php';
 if ( file_exists( $maintPath ) ) {
@@ -15,11 +16,13 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 	 */
 	public function doDBUpdates() {
 		$db = $this->getDB( DB_PRIMARY );
-		$db->delete( 'mws_title_index', '*', __METHOD__ );
+		$db->delete( 'mws_title_index', [
+			'mti_wiki_id' => WikiMap::getCurrentWikiId(),
+		], __METHOD__ );
 
 		$titles = $db->select(
 			[ 'p' => 'page', 'pp' => 'page_props' ],
-			[ 'page_id', 'page_namespace', 'page_title', 'pp_value' ],
+			[ 'page_id', 'page_namespace', 'page_content_model', 'page_lang', 'page_title', 'pp_value' ],
 			[],
 			__METHOD__,
 			[],
@@ -79,6 +82,10 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 				'mti_displaytitle' => mb_strtolower( str_replace( '_', ' ', $title->pp_value ?? '' ) ),
 				'mti_leaf_title' => mb_strtolower( str_replace( '_', ' ', $leafTitle ) ),
 				'mti_first_letter' => $firstLetter,
+				'mti_wiki_id' => WikiMap::getCurrentWikiId(),
+				'mti_db_key' => $title->page_title,
+				'mti_content_model' => $title->page_content_model,
+				'mti_page_lang' => $title->page_lang,
 			];
 			if ( $cnt % $batch === 0 ) {
 				$this->insertBatch( $toInsert );
@@ -112,7 +119,7 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 	 * @return string
 	 */
 	protected function getUpdateKey() {
-		return 'mws-title-index-init-with-redirect-with-leaf-with-first-letter';
+		return 'mws-title-index-init-with-redirect-with-leaf-with-first-letter-and-wiki-id';
 	}
 }
 

@@ -1,5 +1,103 @@
-[
-	{
+{
+	"before": {
+		"name": "mws_title_index",
+		"columns": [
+			{
+				"name": "mti_page_id",
+				"type": "integer",
+				"options": {
+					"unsigned": true,
+					"notnull": true
+				}
+			},
+			{
+				"name": "mti_namespace",
+				"type": "integer",
+				"options": {
+					"unsigned": true,
+					"notnull": true
+				}
+			},
+			{
+				"name": "mti_title",
+				"type": "binary",
+				"options": {
+					"length": 255,
+					"notnull": true
+				}
+			},
+			{
+				"name": "mti_displaytitle",
+				"type": "binary",
+				"options": {
+					"length": 255,
+					"notnull": true
+				}
+			},
+			{
+				"name": "mti_leaf_title",
+				"type": "binary",
+				"options": {
+					"length": 255,
+					"notnull": true
+				}
+			},
+			{
+				"name": "mti_first_letter",
+				"type": "binary",
+				"options": {
+					"length": 32,
+					"notnull": true,
+					"default": ""
+				}
+			},
+			{
+				"name": "mti_wiki_id",
+				"type": "binary",
+				"options": {
+					"length": 255,
+					"notnull": true,
+					"default": ""
+				}
+			}
+		],
+		"indexes": [
+			{
+				"name": "mws_title_index_title_index",
+				"columns": [
+					"mti_title"
+				],
+				"unique": false
+			},
+			{
+				"name": "mws_title_index_displaytitle_index",
+				"columns": [
+					"mti_displaytitle"
+				],
+				"unique": false
+			},
+			{
+				"name": "mws_title_index_leaftitle_index",
+				"columns": [
+					"mti_leaf_title"
+				],
+				"unique": false
+			},
+			{
+				"name": "mws_title_index_first_letter_index",
+				"columns": [
+					"mti_first_letter",
+					"mti_namespace"
+				],
+				"unique": false
+			}
+		],
+		"pk": [
+			"mti_page_id",
+			"mti_wiki_id"
+		]
+	},
+	"after": {
 		"name": "mws_title_index",
 		"columns": [
 			{
@@ -109,4 +207,4 @@
 		],
 		"pk": [ "mti_page_id", "mti_wiki_id" ]
 	}
-]
+}
