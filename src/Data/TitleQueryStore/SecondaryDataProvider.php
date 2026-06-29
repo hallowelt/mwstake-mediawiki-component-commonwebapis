@@ -87,7 +87,10 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 				);
 				if ( $interwiki ) {
 					return $this->titleFactory->makeTitle(
-						$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_DBKEY ), '', $interwiki
+						$record->get( TitleRecord::PAGE_NAMESPACE ),
+						$record->get( TitleRecord::PAGE_DBKEY ),
+						'',
+						$interwiki
 					);
 				}
 			}
