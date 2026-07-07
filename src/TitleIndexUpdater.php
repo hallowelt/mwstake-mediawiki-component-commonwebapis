@@ -16,6 +16,7 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\Hook\PageSaveCompleteHook;
 use MediaWiki\Title\Title;
+use MediaWiki\WikiMap\WikiMap;
 use Wikimedia\Rdbms\DBConnRef;
 use Wikimedia\Rdbms\ILoadBalancer;
 
@@ -146,7 +147,11 @@ class TitleIndexUpdater implements
 			'mti_title' => mb_strtolower( str_replace( '_', ' ', $page->getDBkey() ) ),
 			'mti_displaytitle' => $this->getDisplayTitle( $page ),
 			'mti_leaf_title' => mb_strtolower( str_replace( '_', ' ', $leaf ) ),
-			'mti_first_letter' => $this->getFirstLetter( $page->getDBkey() )
+			'mti_first_letter' => $this->getFirstLetter( $page->getDBkey() ),
+			'mti_wiki_id' => WikiMap::getCurrentWikiId(),
+			'mti_db_key' => $page->getDBkey(),
+			'mti_content_model' => $page->getContentModel(),
+			'mti_page_lang' => $page->getPageLanguage()->getCode() ?? '',
 		];
 
 		return $db->upsert(

@@ -6,6 +6,7 @@ use MediaWiki\Context\RequestContext;
 use MediaWiki\Language\Language;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\NamespaceInfo;
+use MediaWiki\WikiMap\WikiMap;
 use MWStake\MediaWiki\Component\DataStore\Filter;
 use MWStake\MediaWiki\Component\DataStore\PrimaryDatabaseDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -122,9 +123,13 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			$matchPercent = min( $queryLen / $lenMatchField, 1.0 );
 			// Half the boost for match is base title
 			$row->_score += $hasPrimaryMatch ? $matchPercent : $matchPercent / 2;
-			if ( (int)$row->page_namespace === NS_MAIN ) {
+			if ( (int)$row->mti_namespace === NS_MAIN ) {
 				// Slight boost NS_MAIN
 				$row->_score += 0.1;
+			}
+			if ( $res->mti_wiki_id === WikiMap::getCurrentWikiId() ) {
+				// 20% boost
+				$row->_score += ( $row->_score * 0.2 );
 			}
 			$ranked[] = $row;
 		}
@@ -215,7 +220,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 					] );
 				}
 				$filter->setApplied( true );
-				$conds[] = 'page_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
+				$conds[] = 'mti_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
 			}
 			if ( $filter->getField() === 'sortkey' ) {
 				$filter->setApplied( true );
@@ -253,6 +258,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 		} elseif ( !empty( $restrictedNamespaces ) ) {
 			$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $restrictedNamespaces ) . ')';
 		}
+
+		$conds['mti_wiki_id'] = $this->getWikisToSearchIn();
 
 		return $conds;
 	}
@@ -318,8 +325,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 */
 	protected function getFields() {
 		return [
-			'mti_page_id', 'mti_title', 'mti_displaytitle', 'mti_leaf_title', 'page_namespace', 'page_title',
-			'page_content_model', 'page_lang', 'mti_first_letter'
+			'mti_page_id', 'mti_title', 'mti_displaytitle', 'mti_leaf_title', 'mti_namespace', 'mti_db_key',
+			'mti_content_model', 'mti_page_lang', 'mti_first_letter', 'mti_wiki_id'
 		];
 	}
 
@@ -341,35 +348,32 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	protected function appendRowToData( \stdClass $row ) {
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
-			TitleRecord::PAGE_NAMESPACE => (int)$row->page_namespace,
-			TitleRecord::PAGE_DBKEY => $row->page_title,
-			TitleRecord::PAGE_CONTENT_MODEL => $row->page_content_model,
+			TitleRecord::PAGE_NAMESPACE => (int)$row->mti_namespace,
+			TitleRecord::PAGE_DBKEY => $row->mti_db_key,
+			TitleRecord::PAGE_CONTENT_MODEL => $row->mti_content_model,
 			// B/C
-			'content_model' => $row->page_content_model,
-			TitleRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
+			'content_model' => $row->mti_content_model,
+			TitleRecord::IS_CONTENT_PAGE => in_array( $row->mti_namespace, $this->contentNamespaces ),
 			TitleRecord::PAGE_EXISTS => true,
 			TitleRecord::LEAF_TITLE => '',
 			TitleRecord::BASE_TITLE => '',
 			'_score' => $row->_score ?? 0,
-			TitleRecord::SORTKEY => $row->mti_first_letter
+			TitleRecord::SORTKEY => $row->mti_first_letter,
+			TitleRecord::WIKI_ID => $row->mti_wiki_id,
 		] );
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function getJoinConds( ReaderParams $params ) {
-		return [
-			'page' => [
-				'INNER JOIN', [ 'mti_page_id = page_id' ]
-			]
-		];
 	}
 
 	/**
 	 * @return string[]
 	 */
 	protected function getTableNames() {
-		return [ 'mws_title_index', 'page' ];
+		return [ 'mws_title_index' ];
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getWikisToSearchIn(): array {
+		return [ WikiMap::getCurrentWikiId() ];
 	}
 }

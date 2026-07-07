@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleTreeStore;
 
 use MediaWiki\MediaWikiServices;
+use MediaWiki\WikiMap\WikiMap;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider as TitlePrimaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\IBucketProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
@@ -75,7 +76,10 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketPro
 		if ( $params->getQuery() !== '' ) {
 			$this->query = mb_strtolower( str_replace( '_', ' ', $params->getQuery() ) );
 		}
-		return parent::makePreFilterConds( $params );
+		$parentConds = parent::makePreFilterConds( $params );
+		// TreeStore is always local!
+		$parentConds['mti_wiki_id'] = [ WikiMap::getCurrentWikiId() ];
+		return $parentConds;
 	}
 
 	/**
@@ -493,5 +497,33 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketPro
 	 */
 	public function getBuckets(): array {
 		return [ 'sortkey' => $this->buckets ];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function getFields() {
+		return [
+			'mti_page_id', 'mti_title', 'mti_displaytitle', 'mti_leaf_title', 'page_namespace', 'page_title',
+			'page_content_model', 'page_lang', 'mti_first_letter'
+		];
+	}
+
+	/**
+	 * @return string[]
+	 */
+	protected function getTableNames() {
+		return [ 'mws_title_index', 'page' ];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	protected function getJoinConds( ReaderParams $params ) {
+		return [
+			'page' => [
+				'INNER JOIN', [ 'mti_page_id = page_id' ]
+			]
+		];
 	}
 }

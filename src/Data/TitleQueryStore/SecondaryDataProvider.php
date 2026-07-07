@@ -3,10 +3,12 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
 use MediaWiki\Language\Language;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
+use MediaWiki\WikiMap\WikiMap;
 use MWStake\MediaWiki\Component\DataStore\ISecondaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\Record;
 
@@ -76,6 +78,23 @@ class SecondaryDataProvider implements ISecondaryDataProvider {
 	 * @return Title|null
 	 */
 	protected function titleFromRecord( $record ) {
+		if ( $record->get( TitleRecord::WIKI_ID ) !== WikiMap::getCurrentWikiId() ) {
+			$interwiki = '';
+			$wikiId = $record->get( TitleRecord::WIKI_ID );
+			if ( $wikiId ) {
+				MediaWikiServices::getInstance()->getHookContainer()->run(
+					'GetInterwikiPrefixFromWikiId', [ $record->get( TitleRecord::WIKI_ID ), &$interwiki ]
+				);
+				if ( $interwiki ) {
+					return $this->titleFactory->makeTitle(
+						$record->get( TitleRecord::PAGE_NAMESPACE ),
+						$record->get( TitleRecord::PAGE_DBKEY ),
+						'',
+						$interwiki
+					);
+				}
+			}
+		}
 		return $this->titleFactory->makeTitle(
 			$record->get( TitleRecord::PAGE_NAMESPACE ), $record->get( TitleRecord::PAGE_DBKEY )
 		);

@@ -65,6 +65,16 @@ MWStake\MediaWiki\ComponentLoader\Bootstrapper::getInstance()
 					'mti_first_letter',
 					__DIR__ . "/sql/$dbType/mws_title_index_first_letter_patch.sql"
 				);
+				$updater->addExtensionField(
+					'mws_title_index',
+					'mti_wiki_id',
+					__DIR__ . "/sql/$dbType/mws_title_index_wiki_id_patch.sql"
+				);
+				$updater->addExtensionField(
+					'mws_title_index',
+					'mti_content_model',
+					__DIR__ . "/sql/$dbType/mws_title_index_local_fields_patch.sql"
+				);
 
 				$updater->addPostDatabaseUpdateMaintenance(
 					\MWStake\MediaWiki\Component\CommonWebAPIs\Maintenance\PopulateUserIndex::class
