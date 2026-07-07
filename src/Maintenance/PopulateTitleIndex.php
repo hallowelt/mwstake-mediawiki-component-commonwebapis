@@ -85,7 +85,7 @@ class PopulateTitleIndex extends LoggedUpdateMaintenance {
 				'mti_wiki_id' => WikiMap::getCurrentWikiId(),
 				'mti_db_key' => $title->page_title,
 				'mti_content_model' => $title->page_content_model,
-				'mti_page_lang' => $title->page_lang,
+				'mti_page_lang' => $title->page_lang ?? $code,
 			];
 			if ( $cnt % $batch === 0 ) {
 				$this->insertBatch( $toInsert );
