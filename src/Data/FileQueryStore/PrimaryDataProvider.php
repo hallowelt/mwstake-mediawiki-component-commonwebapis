@@ -147,7 +147,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	protected function getFields() {
 		return array_merge(
 			parent::getFields(), [
-				'img_actor', 'img_major_mime', 'img_minor_mime', 'actor_name',
+				'mti_page_id', 'img_actor', 'img_major_mime', 'img_minor_mime', 'actor_name',
 				'comment_text', "GROUP_CONCAT( cl_to SEPARATOR '|') categories",
 				'img_timestamp', 'img_size'
 			] );
@@ -173,12 +173,12 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 		$this->data[] = new TitleRecord( (object)[
 			TitleRecord::PAGE_ID => (int)$row->mti_page_id,
 			TitleRecord::PAGE_NAMESPACE => NS_FILE,
-			TitleRecord::PAGE_TITLE => $row->page_title,
-			TitleRecord::PAGE_DBKEY => $row->page_title,
+			TitleRecord::PAGE_TITLE => $row->mti_db_key,
+			TitleRecord::PAGE_DBKEY => $row->mti_db_key,
 			TitleRecord::PAGE_CONTENT_MODEL => $row->page_content_model,
-			TitleRecord::IS_CONTENT_PAGE => in_array( $row->page_namespace, $this->contentNamespaces ),
+			TitleRecord::IS_CONTENT_PAGE => in_array( $row->mti_page_namespace, $this->contentNamespaces ),
 			FileRecord::FILE_TIMESTAMP => $row->img_timestamp,
-			FileRecord::FILE_EXTENSION => $this->getExtension( $row->page_title ),
+			FileRecord::FILE_EXTENSION => $this->getExtension( $row->mti_db_key ),
 			FileRecord::FILE_SIZE => $row->img_size,
 			FileRecord::MIME_MAJOR => $row->img_major_mime,
 			FileRecord::MIME_MINOR => $row->img_minor_mime,
@@ -194,17 +194,14 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	 */
 	protected function getJoinConds( ReaderParams $params ) {
 		return array_merge( parent::getJoinConds( $params ), [
-			'page' => [
-				'INNER JOIN', [ 'mti_page_id = page_id' ]
-			],
 			'image' => [
-				'INNER JOIN', [ 'page_title = img_name' ]
+				'INNER JOIN', [ 'mti_db_key = img_name' ]
 			],
 			'comment' => [
 				'INNER JOIN', [ 'img_description_id = comment_id' ]
 			],
 			'categorylinks' => [
-				'LEFT JOIN', [ 'page_id = cl_from' ]
+				'LEFT JOIN', [ 'mti_page_id = cl_from' ]
 			],
 			'actor' => [
 				'LEFT JOIN', [ 'img_actor = actor_id' ]
@@ -253,7 +250,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	 * @return array
 	 */
 	protected function getDefaultOptions() {
-		return [ 'GROUP BY' => 'page_id' ];
+		return [ 'GROUP BY' => 'mti_page_id' ];
 	}
 
 	/**
