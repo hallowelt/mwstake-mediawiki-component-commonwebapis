@@ -15,7 +15,7 @@ use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\ResultWrapper;
 
-/*
+/**
  * @stable to extend
  */
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider {

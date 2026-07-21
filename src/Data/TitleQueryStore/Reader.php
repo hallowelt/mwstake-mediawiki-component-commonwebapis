@@ -9,7 +9,7 @@ use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use Wikimedia\Rdbms\ILoadBalancer;
 
-/*
+/**
  * @stable to extend
  */
 class Reader extends \MWStake\MediaWiki\Component\DataStore\TitleAwareReader {

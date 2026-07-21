@@ -77,7 +77,7 @@ function queryStore( store, params, cacheKey ) {
 				// Replace named placeholders in curly braces with actual values
 				const key = cacheKey.replace( /\{([^}]+)\}/g, ( match, p1 ) => result[ p1 ] );
 				// if cache key contains a placeholder that is not in the result, skip
-				if ( key.indexOf( '{' ) !== -1 ) {
+				if ( key.indexOf( '{' ) !== -1 ) { // eslint-disable-line unicorn/prefer-includes
 					continue;
 				}
 				cache.set( key, result );

@@ -12,7 +12,7 @@ use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\ILoadBalancer;
 
-/*
+/**
  * @stable to extend
  */
 class Reader extends \MWStake\MediaWiki\Component\DataStore\Reader {

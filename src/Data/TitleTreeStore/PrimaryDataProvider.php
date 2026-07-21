@@ -276,7 +276,6 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketPro
 	}
 
 	/**
-	 *
 	 * @param string $title
 	 * @return bool
 	 */

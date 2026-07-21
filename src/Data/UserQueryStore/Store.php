@@ -12,7 +12,7 @@ use MWStake\MediaWiki\Component\DataStore\IStore;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\ILoadBalancer;
 
-/*
+/**
  * @stable to extend
  */
 class Store implements IStore {

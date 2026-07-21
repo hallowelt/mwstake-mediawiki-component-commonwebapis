@@ -246,7 +246,6 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	}
 
 	/**
-	 *
 	 * @return array
 	 */
 	protected function getDefaultOptions() {

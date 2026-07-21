@@ -22,7 +22,6 @@ class CategoryReaderParams extends ReaderParams {
 	}
 
 	/**
-	 *
 	 * @param array $params
 	 */
 	public function __construct( $params = [] ) {
@@ -34,7 +33,6 @@ class CategoryReaderParams extends ReaderParams {
 	}
 
 	/**
-	 *
 	 * @param ReaderParams $params
 	 * @return array
 	 */

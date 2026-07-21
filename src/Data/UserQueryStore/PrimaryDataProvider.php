@@ -14,7 +14,7 @@ use MWStake\MediaWiki\Component\DataStore\Schema;
 use MWStake\MediaWiki\Component\Utils\UtilityFactory;
 use Wikimedia\Rdbms\IDatabase;
 
-/*
+/**
  * @stable to extend
  */
 class PrimaryDataProvider extends PrimaryDatabaseDataProvider implements IBucketProvider {
