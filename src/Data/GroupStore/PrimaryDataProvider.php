@@ -4,6 +4,7 @@ namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\GroupStore;
 
 use MediaWiki\Config\GlobalVarConfig;
 use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\Message\Message;
 use MWStake\MediaWiki\Component\DataStore\IPrimaryDataProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 use MWStake\MediaWiki\Component\Utils\Utility\GroupHelper;
@@ -61,7 +62,7 @@ class PrimaryDataProvider implements IPrimaryDataProvider {
 		foreach ( $explicitGroups as $group ) {
 			$groupType = $this->groupHelper->getGroupType( $group );
 			$displayName = $group;
-			$msg = \Message::newFromKey( "group-$group" );
+			$msg = Message::newFromKey( "group-$group" );
 			if ( $msg->exists() ) {
 				$displayName = $msg->plain() . " ($group)";
 			}
