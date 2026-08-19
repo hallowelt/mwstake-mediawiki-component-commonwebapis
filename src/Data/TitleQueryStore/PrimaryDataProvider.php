@@ -259,9 +259,49 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $restrictedNamespaces ) . ')';
 		}
 
-		$conds['mti_wiki_id'] = $this->getWikisToSearchIn();
+		$wikisToSearchIn = $this->getWikisToSearchIn();
+		$filteredWikiIds = $this->getFilteredWikiIds( $filters );
+		if ( $filteredWikiIds !== null ) {
+			$wikisToSearchIn = array_values( array_intersect( $wikisToSearchIn, $filteredWikiIds ) );
+		}
+		if ( empty( $wikisToSearchIn ) ) {
+			$conds[] = '1=0';
+		} else {
+			$conds['mti_wiki_id'] = $wikisToSearchIn;
+		}
 
 		return $conds;
+	}
+
+	/**
+	 * @param Filter[] $filters
+	 * @return string[]|null
+	 */
+	private function getFilteredWikiIds( array $filters ): ?array {
+		$wikiIds = [];
+		foreach ( $filters as $filter ) {
+			if ( $filter->getField() !== TitleRecord::WIKI_ID ) {
+				continue;
+			}
+
+			$filterValue = $filter->getValue();
+			if ( !is_array( $filterValue ) ) {
+				$filterValue = [ $filterValue ];
+			}
+			foreach ( $filterValue as $wikiId ) {
+				if ( $wikiId === '_local' ) {
+					$wikiId = WikiMap::getCurrentWikiId();
+				}
+				$wikiIds[] = (string)$wikiId;
+			}
+			$filter->setApplied( true );
+		}
+
+		if ( empty( $wikiIds ) ) {
+			return null;
+		}
+
+		return array_values( array_unique( $wikiIds ) );
 	}
 
 	/**
@@ -336,7 +376,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	protected function skipPreFilter( Filter $filter ) {
 		return in_array( $filter->getField(), [
 			TitleRecord::PAGE_NAMESPACE, TitleRecord::PAGE_NAMESPACE_TEXT,
-			TitleRecord::IS_CONTENT_PAGE
+			TitleRecord::IS_CONTENT_PAGE, TitleRecord::WIKI_ID
 		] );
 	}
 
