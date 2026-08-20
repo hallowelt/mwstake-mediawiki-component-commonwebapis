@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore;
 
 use MediaWiki\Context\RequestContext;
+use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Language\Language;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\NamespaceInfo;
@@ -32,6 +33,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	/** @var UtilityFactory */
 	protected $utilityFactory;
 
+	/** @var HookContainer */
+	protected $hookContainer;
+
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
@@ -40,7 +44,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 * @param UtilityFactory|null $utilityFactory
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo, ?UtilityFactory $utilityFactory = null
+		IDatabase $db, Schema $schema, Language $language, NamespaceInfo $nsInfo,
+		?UtilityFactory $utilityFactory = null, ?HookContainer $hookContainer = null
 	) {
 		parent::__construct( $db, $schema );
 		$this->language = $language;
@@ -50,6 +55,11 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			$utilityFactory = MediaWikiServices::getInstance()->getService( 'MWStakeCommonUtilsFactory' );
 		}
 		$this->utilityFactory = $utilityFactory;
+
+		if ( !$hookContainer ) {
+			$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
+		}
+		$this->hookContainer = $hookContainer;
 	}
 
 	/**
@@ -58,14 +68,17 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	public function makeData( $params ) {
 		$this->data = [];
 
-		$res = $this->db->select(
-			$this->getTableNames(),
-			$this->getFields(),
-			$this->makePreFilterConds( $params ),
-			__METHOD__,
-			$this->makePreOptionConds( $params ),
-			$this->getJoinConds( $params )
-		);
+		$query = $this->db->newSelectQueryBuilder()
+			->tables( $this->getTableNames() )
+			->fields( $this->getFields() )
+			->conds( $this->makePreFilterConds( $params ) )
+			->options( $this->makePreOptionConds( $params ) )
+			->joinConds( $this->getJoinConds( $params ) )
+			->caller( __METHOD__ );
+
+		$this->hookContainer->run( 'MWStakeCommonWebAPIsTitleStoreQuery', [ $query, $params ] );
+
+		$res = $query->fetchResultSet();
 
 		if ( $params->getQuery() !== '' ) {
 			$res = $this->rerank( $params->getQuery(), $res );
