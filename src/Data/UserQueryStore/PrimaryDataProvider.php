@@ -3,6 +3,7 @@
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\UserQueryStore;
 
 use MediaWiki\Config\GlobalVarConfig;
+use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Sanitizer;
@@ -27,21 +28,29 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider implements IBucket
 	protected $mwsgConfig;
 	/** @var UtilityFactory */
 	protected $utilityFactory;
+	/** @var HookContainer|null */
+	protected $hookContainer;
 
 	/**
 	 * @param IDatabase $db
 	 * @param Schema $schema
 	 * @param GlobalVarConfig $mwsgConfig
 	 * @param UtilityFactory|null $utilityFactory
+	 * @param HookContainer|null $hookContainer
 	 */
 	public function __construct(
-		IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig, ?UtilityFactory $utilityFactory = null
+		IDatabase $db, Schema $schema, GlobalVarConfig $mwsgConfig, ?UtilityFactory $utilityFactory = null,
+		?HookContainer $hookContainer = null
 	) {
 		parent::__construct( $db, $schema );
 		$this->mwsgConfig = $mwsgConfig;
 		if ( !$utilityFactory ) {
 			$utilityFactory = MediaWikiServices::getInstance()->getService( 'MWStakeCommonUtilsFactory' );
 		}
+		if ( !$hookContainer ) {
+			$hookContainer = MediaWikiServices::getInstance()->getHookContainer();
+		}
+		$this->hookContainer = $hookContainer;
 		$this->utilityFactory = $utilityFactory;
 	}
 
@@ -242,7 +251,8 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider implements IBucket
 	 */
 	protected function appendRowToData( \stdClass $row ) {
 		$realName = $row->user_real_name !== null ? Sanitizer::stripAllTags( $row->user_real_name ?? '' ) : null;
-		$groups = $this->getAllowedGroups( explode( '|', $row->groups ) );
+		$allGroups = explode( '|', $row->groups );
+		$groups = $this->getAllowedGroups( $allGroups );
 		$resultRow = [
 			'user_id' => (int)$row->user_id,
 			'user_name' => $row->user_name,
@@ -252,7 +262,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider implements IBucket
 			'user_email' => $row->user_email,
 			'groups' => $this->setGroupLabels( $groups ),
 			'groups_raw' => $groups,
-			'groups_all' => explode( '|', $row->groups ),
+			'groups_all' => $allGroups,
 			'enabled' => !$this->isUserBlocked( (int)$row->user_id ),
 			// legacy fields
 			'display_name' => !$realName ? $row->user_name : $realName,
@@ -346,7 +356,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider implements IBucket
 	 * @return array
 	 */
 	private function getAllowedGroups( array $groups ): array {
-		$allowed = $this->utilityFactory->getGroupHelper()->getAvailableGroups();
+		$types = [];
+		$this->hookContainer->run( 'MWStakeUserStoreVisibleGroupsTypeFilter', [ &$types ] );
+		$allowed = $this->utilityFactory->getGroupHelper()->getAvailableGroups( [ 'filter' => $types ] );
 		return array_values( array_intersect( $groups, $allowed ) );
 	}
 
