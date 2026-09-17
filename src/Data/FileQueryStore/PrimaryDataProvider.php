@@ -148,7 +148,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 		return array_merge(
 			parent::getFields(), [
 				'mti_page_id', 'img_actor', 'img_major_mime', 'img_minor_mime', 'actor_name',
-				'comment_text', "GROUP_CONCAT( cl_to SEPARATOR '|') categories",
+				'comment_text', "GROUP_CONCAT( lt_title SEPARATOR '|') categories",
 				'img_timestamp', 'img_size'
 			] );
 	}
@@ -206,6 +206,9 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 			'actor' => [
 				'LEFT JOIN', [ 'img_actor = actor_id' ]
 			],
+			'linktarget' => [
+				'INNER JOIN', [ 'cl_target_id = lt_id' ]
+			]
 		] );
 	}
 
@@ -214,7 +217,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 	 */
 	protected function getTableNames() {
 		return array_merge( parent::getTableNames(), [
-			'image', 'comment', 'categorylinks', 'actor'
+			'image', 'comment', 'categorylinks', 'actor', 'linktarget'
 		] );
 	}
 
