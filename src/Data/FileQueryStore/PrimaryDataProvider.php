@@ -207,7 +207,7 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider {
 				'LEFT JOIN', [ 'img_actor = actor_id' ]
 			],
 			'linktarget' => [
-				'INNER JOIN', [ 'cl_target_id = lt_id' ]
+				'LEFT JOIN', [ 'cl_target_id = lt_id' ]
 			]
 		] );
 	}
