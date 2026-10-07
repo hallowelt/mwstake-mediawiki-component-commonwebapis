@@ -2,11 +2,11 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs;
 
-use ManualLogEntry;
 use MediaWiki\Collation\CollationFactory;
 use MediaWiki\Hook\AfterImportPageHook;
 use MediaWiki\Hook\PageMoveCompleteHook;
 use MediaWiki\Language\Language;
+use MediaWiki\Logging\ManualLogEntry;
 use MediaWiki\Page\Hook\PageDeleteCompleteHook;
 use MediaWiki\Page\Hook\PageUndeleteCompleteHook;
 use MediaWiki\Page\PageIdentity;
