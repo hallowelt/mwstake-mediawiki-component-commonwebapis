@@ -160,7 +160,6 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	 */
 	protected function makePreFilterConds( ReaderParams $params ) {
 		$filters = $params->getFilter();
-		$conds = parent::makePreFilterConds( $params );
 		$query = $params->getQuery();
 		$nsFilter = [];
 		foreach ( $filters as $filter ) {
@@ -173,9 +172,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				if ( !$query && $filter->getComparison() === Filter::COMPARISON_CONTAINS ) {
 					$query = $filter->getValue();
 				}
-			}
-
-			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
+			} elseif ( $filter->getField() === TitleRecord::PAGE_NAMESPACE ) {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
 						Filter::KEY_FIELD => TitleRecord::PAGE_NAMESPACE,
@@ -185,10 +182,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				}
 				$nsFilter = array_merge( $nsFilter, $filter->getValue() );
 				$filter->setApplied( true );
-			}
-
-			// Apply namespace text filter
-			if ( $filter->getField() === TitleRecord::PAGE_NAMESPACE_TEXT && !$filter->isApplied() ) {
+			} elseif ( $filter->getField() === TitleRecord::PAGE_NAMESPACE_TEXT && !$filter->isApplied() ) {
 				$filterValue = $filter->getValue();
 
 				if ( !is_array( $filterValue ) ) {
@@ -215,29 +209,27 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				}
 
 				$nsFilter = array_merge( $nsFilter, $filter->getValue() );
-			}
-
-			if ( $filter->getField() === TitleRecord::IS_CONTENT_PAGE ) {
+			} elseif ( $filter->getField() === TitleRecord::IS_CONTENT_PAGE ) {
 				if ( $filter->getValue() ) {
 					$nsFilter = array_merge( $nsFilter, $this->contentNamespaces );
 				} else {
 					$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $this->contentNamespaces ) . ')';
 				}
-			}
-			if ( $filter->getField() === TitleRecord::PAGE_CONTENT_MODEL ) {
+			} elseif ( $filter->getField() === TitleRecord::PAGE_CONTENT_MODEL ) {
 				if ( !( $filter instanceof Filter\ListValue ) ) {
 					$filter = new Filter\StringValue( [
-						Filter::KEY_FIELD => TitleRecord::PAGE_CONTENT_MODEL,
+						Filter::KEY_FIELD => 'mti_content_model',
 						Filter::KEY_VALUE => [ $filter->getValue() ],
 						Filter::KEY_COMPARISON => 'in'
 					] );
 				}
 				$filter->setApplied( true );
 				$conds[] = 'mti_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
-			}
-			if ( $filter->getField() === 'sortkey' ) {
+			} elseif ( $filter->getField() === 'sortkey' ) {
 				$filter->setApplied( true );
 				$conds['mti_first_letter'] = $filter->getValue();
+			} else {
+				parent::appendPreFilterCond( $conds, $filter );
 			}
 		}
 
@@ -343,11 +335,11 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 	protected function processQuery( string $query ) {
 		$query = mb_strtolower( str_replace( '_', ' ', $query ) );
 		$titleQuery = 'mti_title ' . $this->db->buildLike(
-			$this->db->anyString(), $query, $this->db->anyString()
-		);
+				$this->db->anyString(), $query, $this->db->anyString()
+			);
 		$displayTitleQuery = 'mti_displaytitle ' . $this->db->buildLike(
-			$this->db->anyString(), $query, $this->db->anyString()
-		);
+				$this->db->anyString(), $query, $this->db->anyString()
+			);
 		$leafQuery = 'mti_leaf_title ' . $this->db->buildLike(
 				$this->db->anyString(), $query, $this->db->anyString()
 			);
