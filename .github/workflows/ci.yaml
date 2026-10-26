@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.5
           tools: composer:2
 
       - name: Validate composer.json
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 26
 
       - name: Install dependencies
         run: npm ci
@@ -53,11 +53,11 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.3
+          php-version: 8.5
           tools: composer:2
 
       - name: Clone MediaWiki
-        run: git clone --depth 1 -b REL1_43 https://gerrit.wikimedia.org/r/mediawiki/core.git .
+        run: git clone --depth 1 -b REL1_47 https://gerrit.wikimedia.org/r/mediawiki/core.git .
 
       - name: Install dependencies
         run: composer update
