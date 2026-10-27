@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\FileQueryStore;
 
+use MediaWiki\FileRepo\RepoGroup;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Permissions\PermissionManager;
@@ -21,7 +22,7 @@ class Store implements IStore {
 	protected $nsInfo;
 	/** @var PageProps */
 	protected $pageProps;
-	/** @var \RepoGroup */
+	/** @var RepoGroup */
 	protected $repoGroup;
 	/** @var PermissionManager */
 	protected $permissionManager;
@@ -32,12 +33,12 @@ class Store implements IStore {
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
-	 * @param \RepoGroup $repoGroup
+	 * @param RepoGroup $repoGroup
 	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		ILoadBalancer $lb, TitleFactory $titleFactory, Language $language,
-		NamespaceInfo $nsInfo, PageProps $pageProps, \RepoGroup $repoGroup,
+		NamespaceInfo $nsInfo, PageProps $pageProps, RepoGroup $repoGroup,
 		?PermissionManager $permissionManager = null
 	) {
 		$this->lb = $lb;

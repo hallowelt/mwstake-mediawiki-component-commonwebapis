@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Rest;
 
+use MediaWiki\FileRepo\RepoGroup;
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
@@ -23,12 +24,12 @@ class FileQueryStore extends QueryStore {
 	 * @param Language $language
 	 * @param NamespaceInfo $nsInfo
 	 * @param PageProps $pageProps
-	 * @param \RepoGroup $repoGroup
+	 * @param RepoGroup $repoGroup
 	 * @param PermissionManager|null $permissionManager
 	 */
 	public function __construct(
 		HookContainer $hookContainer, ILoadBalancer $lb, TitleFactory $titleFactory,
-		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, \RepoGroup $repoGroup,
+		Language $language, NamespaceInfo $nsInfo, PageProps $pageProps, RepoGroup $repoGroup,
 		?PermissionManager $permissionManager = null
 	) {
 		parent::__construct( $hookContainer );
