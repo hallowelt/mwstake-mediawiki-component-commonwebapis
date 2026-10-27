@@ -2,12 +2,12 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\FileQueryStore;
 
+use MediaWiki\FileRepo\RepoGroup;
 use MediaWiki\Language\Language;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
-use RepoGroup;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class Reader extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\Reader {
