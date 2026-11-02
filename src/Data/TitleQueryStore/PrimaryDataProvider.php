@@ -140,7 +140,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 				// Slight boost NS_MAIN
 				$row->_score += 0.1;
 			}
-			if ( $res->mti_wiki_id === WikiMap::getCurrentWikiId() ) {
+			if ( $row->mti_wiki_id === WikiMap::getCurrentWikiId() ) {
 				// 20% boost
 				$row->_score += ( $row->_score * 0.2 );
 			}
@@ -212,7 +212,7 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 			} elseif ( $filter->getField() === TitleRecord::IS_CONTENT_PAGE ) {
 				if ( $filter->getValue() ) {
 					$nsFilter = array_merge( $nsFilter, $this->contentNamespaces );
-				} else {
+				} elseif ( !empty( $this->contentNamespaces ) ) {
 					$conds[] = 'mti_namespace NOT IN (' . $this->db->makeList( $this->contentNamespaces ) . ')';
 				}
 			} elseif ( $filter->getField() === TitleRecord::PAGE_CONTENT_MODEL ) {
@@ -224,7 +224,9 @@ class PrimaryDataProvider extends PrimaryDatabaseDataProvider {
 					] );
 				}
 				$filter->setApplied( true );
-				$conds[] = 'mti_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
+				if ( !empty( $filter->getValue() ) ) {
+					$conds[] = 'mti_content_model IN (' . $this->db->makeList( $filter->getValue() ) . ')';
+				}
 			} elseif ( $filter->getField() === 'sortkey' ) {
 				$filter->setApplied( true );
 				$conds['mti_first_letter'] = $filter->getValue();
