@@ -2,6 +2,7 @@
 
 namespace MWStake\MediaWiki\Component\CommonWebAPIs\Data\CategoryQueryStore;
 
+use MediaWiki\WikiMap\WikiMap;
 use MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryStore\PrimaryDataProvider as TitlePrimaryProvider;
 use MWStake\MediaWiki\Component\DataStore\ReaderParams;
 
@@ -16,9 +17,11 @@ class PrimaryDataProvider extends TitlePrimaryProvider {
 			[ 'mws_category_index', 'category' ],
 			[
 				'0 as mti_page_id',
-				'\'\' as page_content_model',
-				'cat_title as page_title',
-				NS_CATEGORY . ' as page_namespace'
+				'\'\' as mti_content_model',
+				'cat_title as mti_db_key',
+				NS_CATEGORY . ' as mti_namespace',
+				'\'\' as mti_first_letter',
+				$this->db->addQuotes( WikiMap::getCurrentWikiId() ) . ' as mti_wiki_id'
 			],
 			$this->makePreFilterConds( $params ),
 			__METHOD__,
