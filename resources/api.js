@@ -139,7 +139,7 @@ mws.commonwebapis = {
 	},
 	category: {
 		query: function ( query, params ) {
-			return cache.getCachedPromise( 'promise-category-query', () => queryStore( 'category-query-store', Object.assign( { query: query }, params || {} ) ) );
+			return cache.getCachedPromise( 'promise-category-query-' + query, () => queryStore( 'category-query-store', Object.assign( { query: query }, params || {} ) ) );
 		}
 	}
 };
