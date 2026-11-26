@@ -180,6 +180,7 @@ class TitleIndexUpdater implements
 			[
 				'mti_namespace' => $namespace,
 				'mti_title' => mb_strtolower( str_replace( '_', ' ', $title ) ),
+				'mti_wiki_id' => WikiMap::getCurrentWikiId(),
 			],
 			__METHOD__
 		);
