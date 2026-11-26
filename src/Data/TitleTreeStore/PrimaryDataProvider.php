@@ -83,6 +83,25 @@ class PrimaryDataProvider extends TitlePrimaryDataProvider implements IBucketPro
 	}
 
 	/**
+	 * Sortable record fields, like "dbkey", are no database columns. Sorting by them is
+	 * done on every level of the tree by the reader's Sorter, so only "sortkey" is mapped
+	 * to the query here
+	 *
+	 * @param ReaderParams $params
+	 *
+	 * @return array
+	 */
+	protected function makePreOptionConds( ReaderParams $params ) {
+		$options = [];
+		foreach ( $params->getSort() as $sort ) {
+			if ( $sort->getProperty() === 'sortkey' ) {
+				$options['ORDER BY'] = 'mti_first_letter ' . $sort->getDirection();
+			}
+		}
+		return $options;
+	}
+
+	/**
 	 * @param \stdClass $row
 	 *
 	 * @return void

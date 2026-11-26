@@ -47,6 +47,15 @@ class Reader extends \MWStake\MediaWiki\Component\CommonWebAPIs\Data\TitleQueryS
 	}
 
 	/**
+	 * @param ReaderParams $params
+	 *
+	 * @return Sorter
+	 */
+	protected function makeSorter( $params ) {
+		return new Sorter( $params->getSort() );
+	}
+
+	/**
 	 * @return SecondaryDataProvider
 	 */
 	public function makeSecondaryDataProvider() {
